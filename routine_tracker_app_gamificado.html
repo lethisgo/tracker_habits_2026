@@ -1,297 +1,262 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Routine Tracker Premium</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Ritual</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+
 <style>
-  body {
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-    background: linear-gradient(180deg,#f2f2f7,#e5e5ea);
-    color:#1c1c1e;
-  }
+:root{
+  --morning:#fde68a;
+  --afternoon:#93c5fd;
+  --evening:#1e293b;
+  --dark:#0b0d11;
+}
 
-  .container {
-    max-width:420px;
-    margin:auto;
-    padding:20px;
-  }
+body{
+  margin:0;
+  font-family:'DM Sans',sans-serif;
+  background:var(--dark);
+  color:white;
+}
 
-  h1 {
-    font-size:26px;
-    font-weight:700;
-    margin-bottom:5px;
-  }
+.app{max-width:420px;margin:auto;padding-bottom:40px}
 
-  .subtitle {
-    font-size:14px;
-    opacity:0.6;
-    margin-bottom:20px;
-  }
+/* HEADER */
+.header{padding:30px 20px 10px}
+.htitle{font-family:'Lora';font-size:26px}
+.hsub{opacity:.6;font-size:13px}
 
-  .card {
-    background:rgba(255,255,255,0.7);
-    backdrop-filter: blur(10px);
-    border-radius:24px;
-    padding:16px;
-    margin-bottom:14px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.08);
-  }
+/* TABS */
+.tabs{display:flex;gap:8px;padding:10px 20px}
+.tab{flex:1;padding:10px;border-radius:999px;border:1px solid #333;background:none;color:#aaa;cursor:pointer}
+.tab.active{background:#fff;color:#000}
 
-  .title {
-    font-weight:600;
-    margin-bottom:10px;
-  }
+/* ROUTINE */
+.routine{margin:16px;border-radius:22px;padding:18px;color:#222}
+.morning{background:var(--morning)}
+.afternoon{background:var(--afternoon)}
+.evening{background:var(--evening);color:#fff}
 
-  .buttons {
-    display:flex;
-    gap:10px;
-  }
+.r-title{font-size:18px;font-weight:600;margin-bottom:10px}
 
-  button {
-    flex:1;
-    padding:12px;
-    border-radius:14px;
-    border:none;
-    font-size:14px;
-    cursor:pointer;
-    opacity:0.6;
-    transition:all 0.2s ease;
-  }
+/* STEP MODE */
+.step{
+  margin-top:20px;
+  text-align:center;
+}
 
-  button.active {
-    transform:scale(1.08);
-    opacity:1;
-    box-shadow:0 6px 14px rgba(0,0,0,0.15);
-  }
+.step-title{
+  font-size:18px;
+  margin-bottom:10px;
+}
 
-  .zero { background:#d1d1d6; }
-  .one { background:#ffd60a; }
-  .two { background:#30d158; color:white; }
+.step-btn{
+  margin-top:20px;
+  padding:12px;
+  width:100%;
+  border:none;
+  border-radius:12px;
+  background:#111;
+  color:white;
+  cursor:pointer;
+}
 
-  .score {
-    text-align:center;
-    margin-top:16px;
-    font-size:20px;
-    font-weight:700;
-  }
+/* WEEK */
+.week{display:flex;gap:6px;padding:20px}
+.day{flex:1;height:50px;border-radius:6px;background:#222}
+.day.fill{background:#22c55e}
 
-  .progress {
-    height:10px;
-    background:#d1d1d6;
-    border-radius:10px;
-    overflow:hidden;
-    margin-top:10px;
-  }
+/* MONTH */
+.month-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+  padding:20px;
+}
 
-  .progress-bar {
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#0a84ff,#5e5ce6);
-  }
+.month-day{
+  aspect-ratio:1;
+  border-radius:5px;
+  background:#222;
+}
 
-  .weekly {
-    margin-top:20px;
-    text-align:center;
-  }
-
-  .badge {
-    font-weight:600;
-    margin-top:6px;
-  }
-
-  .streak {
-    margin-top:10px;
-    font-size:14px;
-  }
-
-  .missions {
-    margin-top:20px;
-  }
-
-  .mission {
-    font-size:14px;
-    margin-bottom:6px;
-  }
+.l1{background:#4ade80}
+.l2{background:#22c55e}
+.l3{background:#15803d}
 
 </style>
+
 </head>
+
 <body>
-<div class="container">
-  <h1>Seu Dia</h1>
-  <div class="subtitle">consistência > perfeição</div>
 
-  <div id="areas"></div>
+<div class="app">
 
-  <div class="score" id="score">0 / 8</div>
-  <div class="progress"><div class="progress-bar" id="progress"></div></div>
+<div class="header">
+  <div class="htitle">Seu Ritual</div>
+  <div class="hsub">consistência > intensidade</div>
+</div>
 
-  <div class="weekly">
-    <div id="weeklyScore"></div>
-    <div class="badge" id="badge"></div>
-    <div class="streak" id="streak"></div>
-  </div>
+<div class="tabs">
+  <button class="tab active" onclick="setView('day',event)">Hoje</button>
+  <button class="tab" onclick="setView('week',event)">Semana</button>
+  <button class="tab" onclick="setView('month',event)">Mês</button>
+</div>
 
-  <div class="card missions">
-    <div class="title">Missões</div>
-    <div id="missions"></div>
-  </div>
+<div id="view-day"></div>
+<div id="view-week" style="display:none"></div>
+<div id="view-month" style="display:none"></div>
+
 </div>
 
 <script>
-const config = {
-  areas: [
-    { id:'corpo', label:'🏋️ Corpo' },
-    { id:'casa', label:'🏠 Casa' },
-    { id:'relacionamento', label:'❤️ Relacionamento' },
-    { id:'voce', label:'🧠 Você' }
-  ]
-};
+// ===== CONFIG =====
 
-const todayKey = new Date().toISOString().slice(0,10);
-let data = JSON.parse(localStorage.getItem('routineData') || '{}');
+const AREAS = [
+ {id:'corpo',label:'Corpo',period:'morning',habits:[
+   {id:'treino',text:'Treinar'},
+   {id:'agua',text:'Beber água'}
+ ]},
+ {id:'mente',label:'Mente',period:'morning',habits:[
+   {id:'meditar',text:'Meditar'},
+   {id:'ler',text:'Ler'}
+ ]},
+ {id:'casa',label:'Casa',period:'evening',habits:[
+   {id:'arrumar',text:'Arrumar casa'}
+ ]}
+];
 
-if (!data[todayKey]) {
-  data[todayKey] = { corpo:0,casa:0,relacionamento:0,voce:0 };
+// ===== STATE =====
+
+const TODAY = new Date().toISOString().slice(0,10);
+
+let state = JSON.parse(localStorage.getItem('ritual_v3') || '{}');
+if(!state.days) state.days = {};
+if(!state.habits) state.habits = {};
+
+if(!state.days[TODAY]){
+  state.days[TODAY] = {};
 }
 
-function renderAreas(){
-  const container = document.getElementById('areas');
-  container.innerHTML='';
-
-  config.areas.forEach(area=>{
-    const card = document.createElement('div');
-    card.className='card';
-    card.innerHTML=`
-      <div class="title">${area.label}</div>
-      <div class="buttons">
-        <button class="zero" onclick="setScore(event,'${area.id}',0)">0</button>
-        <button class="one" onclick="setScore(event,'${area.id}',1)">+1</button>
-        <button class="two" onclick="setScore(event,'${area.id}',2)">+2</button>
-      </div>
-    `;
-    container.appendChild(card);
-  });
+function save(){
+  localStorage.setItem('ritual_v3',JSON.stringify(state));
 }
 
-function setScore(e,area,value){
-  data[todayKey][area]=value;
-  localStorage.setItem('routineData',JSON.stringify(data));
+// ===== VIEW =====
 
-  const buttons=e.target.parentElement.querySelectorAll('button');
-  buttons.forEach(b=>b.classList.remove('active'));
+function setView(v,e){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   e.target.classList.add('active');
 
-  update();
+  document.getElementById('view-day').style.display = v==='day'?'block':'none';
+  document.getElementById('view-week').style.display = v==='week'?'block':'none';
+  document.getElementById('view-month').style.display = v==='month'?'block':'none';
+
+  if(v==='week') renderWeek();
+  if(v==='month') renderMonth();
 }
 
-function update(){
-  const total = Object.values(data[todayKey]).reduce((a,b)=>a+b,0);
-  document.getElementById('score').innerText= total + ' / 8';
-  document.getElementById('progress').style.width=(total/8*100)+'%';
+// ===== STEP FLOW =====
 
-  updateWeekly();
-  updateStreak();
-  updateMissions();
-}
+let currentStep = 0;
+let steps = [];
 
-function getWeekDates(){
-  const now=new Date();
-  const day=now.getDay();
-  const diff=now.getDate()-day+(day===0?-6:1);
-  const monday=new Date(now.setDate(diff));
+function buildSteps(){
+  steps = [];
 
-  let dates=[];
-  for(let i=0;i<7;i++){
-    let d=new Date(monday);
-    d.setDate(monday.getDate()+i);
-    dates.push(d.toISOString().slice(0,10));
-  }
-  return dates;
-}
-
-function updateWeekly(){
-  const week=getWeekDates();
-  let total=0;
-
-  week.forEach(d=>{
-    if(data[d]) total+=Object.values(data[d]).reduce((a,b)=>a+b,0);
-  });
-
-  document.getElementById('weeklyScore').innerText='Semana: '+total;
-
-  let badge='';
-  if(total<=15) badge='💤 sobrevivência';
-  else if(total<=25) badge='⚖️ equilíbrio';
-  else if(total<=35) badge='🔥 consistência';
-  else badge='🚀 elite';
-
-  document.getElementById('badge').innerText=badge;
-}
-
-function updateStreak(){
-  let streak=0;
-  const keys=Object.keys(data).sort().reverse();
-
-  for(let k of keys){
-    const total=Object.values(data[k]).reduce((a,b)=>a+b,0);
-    if(total>=4) streak++;
-    else break;
-  }
-
-  document.getElementById('streak').innerText='🔥 '+streak+' dias consistentes';
-}
-
-function updateMissions(){
-  const week=getWeekDates();
-  let treino=0;
-  let movimento=0;
-
-  week.forEach(d=>{
-    if(data[d]){
-      if(data[d].corpo===2) treino++;
-      if(data[d].corpo>0) movimento++;
-    }
-  });
-
-  const missions = [
-    { text:`Treinos completos: ${treino}/4`, done:treino>=4 },
-    { text:`Movimento diário: ${movimento}/7`, done:movimento>=7 }
-  ];
-
-  const container=document.getElementById('missions');
-  container.innerHTML='';
-
-  missions.forEach(m=>{
-    const div=document.createElement('div');
-    div.className='mission';
-    div.innerText=(m.done?'✅ ':'⬜ ')+m.text;
-    container.appendChild(div);
-  });
-}
-
-function load(){
-  renderAreas();
-  update();
-}
-
-// NOTIFICAÇÃO SIMPLES
-if(Notification && Notification.permission!=='granted'){
-  Notification.requestPermission();
-}
-
-function notify(){
-  if(Notification.permission==='granted'){
-    new Notification('Hora de cuidar de você ✨',{
-      body:'Marca seus pontos do dia e mantém sua consistência'
+  AREAS.forEach(area=>{
+    area.habits.forEach(h=>{
+      steps.push({
+        area:area.id,
+        text:h.text
+      });
     });
-  }
+  });
 }
 
-setInterval(notify, 1000*60*60*6); // a cada 6h
+function renderStep(){
+  if(currentStep >= steps.length){
+    document.getElementById('view-day').innerHTML = `
+      <div class="step">
+        <div class="step-title">Dia concluído 🎉</div>
+      </div>`;
+    return;
+  }
 
-load();
+  const s = steps[currentStep];
+
+  document.getElementById('view-day').innerHTML = `
+    <div class="routine morning">
+      <div class="step">
+        <div class="step-title">${s.text}</div>
+        <button class="step-btn" onclick="completeStep()">Concluir</button>
+      </div>
+    </div>
+  `;
+}
+
+function completeStep(){
+  const s = steps[currentStep];
+
+  if(!state.habits[TODAY]) state.habits[TODAY] = {};
+  state.habits[TODAY][s.text] = true;
+
+  currentStep++;
+  save();
+  renderStep();
+}
+
+// ===== WEEK =====
+
+function dayTotal(date){
+  const d = state.habits[date] || {};
+  return Object.keys(d).length;
+}
+
+function renderWeek(){
+  let html = '<div class="week">';
+  for(let i=0;i<7;i++){
+    const d = new Date();
+    d.setDate(d.getDate()-i);
+    const key = d.toISOString().slice(0,10);
+    const total = dayTotal(key);
+
+    html += `<div class="day ${total>0?'fill':''}"></div>`;
+  }
+  html += '</div>';
+  document.getElementById('view-week').innerHTML = html;
+}
+
+// ===== MONTH =====
+
+function renderMonth(){
+  const now = new Date();
+  const last = new Date(now.getFullYear(), now.getMonth()+1,0).getDate();
+
+  let html = '<div class="month-grid">';
+  for(let i=1;i<=last;i++){
+    const d = new Date(now.getFullYear(),now.getMonth(),i);
+    const key = d.toISOString().slice(0,10);
+    const total = dayTotal(key);
+
+    let lvl = total>=3?3:total>=2?2:total>=1?1:0;
+
+    html += `<div class="month-day l${lvl}"></div>`;
+  }
+  html += '</div>';
+
+  document.getElementById('view-month').innerHTML = html;
+}
+
+// INIT
+buildSteps();
+renderStep();
+
 </script>
+
 </body>
 </html>
