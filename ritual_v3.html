@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>Ritual</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --dark:#0b0d11;
+  --c-morning:#fde68a;
+  --c-afternoon:#93c5fd;
+  --c-evening:#1e293b;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--dark);
+  color:white;
+  min-height:100vh;
+}
+
+.app{
+  max-width:420px;
+  margin:auto;
+  padding:0 0 60px;
+  /* iOS safe area */
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:calc(40px + env(safe-area-inset-bottom));
+}
+
+/* HEADER */
+.header{padding:30px 20px 10px;}
+.htitle{font-family:'Lora',serif;font-size:26px;font-weight:600;}
+.hsub{opacity:.6;font-size:13px;margin-top:4px;font-style:italic;}
+
+/* TABS */
+.tabs{display:flex;gap:8px;padding:10px 20px;}
+.tab{
+  flex:1;padding:10px;border-radius:999px;
+  border:1px solid #333;background:none;color:#aaa;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:500;
+  transition:all .2s;
+}
+.tab.active{background:#fff;color:#000;border-color:#fff;}
+
+/* ROUTINE CARD */
+.routine{
+  margin:16px;border-radius:22px;padding:20px;
+  transition:background .4s;
+}
+.routine.morning  {background:var(--c-morning);color:#422006;}
+.routine.afternoon{background:var(--c-afternoon);color:#1e3a5f;}
+.routine.evening  {background:var(--c-evening);color:#fff;border:1px solid #334155;}
+
+.r-title{
+  font-family:'Lora',serif;
+  font-size:18px;font-weight:600;margin-bottom:14px;
+}
+
+/* STEP */
+.step{text-align:center;padding:10px 0 4px;}
+.step-counter{
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  opacity:.55;margin-bottom:14px;
+}
+.step-title{font-size:20px;font-weight:600;margin-bottom:6px;}
+.step-area{font-size:12px;opacity:.55;margin-bottom:20px;}
+
+.step-btn{
+  margin-top:8px;padding:13px;width:100%;
+  border:none;border-radius:14px;
+  background:rgba(0,0,0,.18);color:inherit;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:600;
+  transition:opacity .15s,transform .1s;
+}
+.step-btn:active{opacity:.75;transform:scale(.98);}
+
+.step-skip{
+  margin-top:8px;padding:10px;width:100%;
+  border:none;border-radius:14px;
+  background:transparent;color:inherit;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:13px;opacity:.5;
+  transition:opacity .15s;
+}
+.step-skip:active{opacity:.3;}
+
+/* DONE SCREEN */
+.done-screen{
+  text-align:center;
+  padding:40px 20px;
+}
+.done-title{
+  font-family:'Lora',serif;
+  font-size:26px;font-weight:600;margin-bottom:8px;
+}
+.done-sub{font-size:14px;opacity:.6;margin-bottom:28px;}
+.done-restart{
+  padding:13px 28px;border-radius:14px;
+  border:1px solid #333;background:none;color:#fff;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:500;
+  transition:background .2s;
+}
+.done-restart:hover{background:#1a1a1a;}
+
+/* WEEK */
+.week-wrap{padding:20px;}
+.week-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.4;margin-bottom:12px;}
+.week{display:flex;gap:6px;}
+.wday{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+.wbar{
+  width:100%;height:50px;border-radius:6px;background:#1a1a1a;
+  position:relative;overflow:hidden;
+}
+.wbar-fill{
+  position:absolute;bottom:0;width:100%;
+  background:#22c55e;border-radius:6px;
+  transition:height .5s ease;
+}
+.wday-label{font-size:9px;opacity:.4;text-transform:uppercase;letter-spacing:.05em;}
+.wday.today .wday-label{opacity:.8;color:#22c55e;}
+.wday.today .wbar{border:1px solid #22c55e33;}
+
+/* MONTH */
+.month-wrap{padding:20px;}
+.month-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.4;margin-bottom:12px;}
+.month-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+}
+.month-day{
+  aspect-ratio:1;border-radius:5px;
+  background:#1a1a1a;
+  transition:background .3s;
+}
+.l1{background:#166534;}
+.l2{background:#22c55e;}
+.l3{background:#4ade80;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="htitle">Seu Ritual</div>
+    <div class="hsub" id="hsub">consistência &gt; intensidade</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-view="day"   onclick="setView('day',   this)">Hoje</button>
+    <button class="tab"        data-view="week"  onclick="setView('week',  this)">Semana</button>
+    <button class="tab"        data-view="month" onclick="setView('month', this)">Mês</button>
+  </div>
+
+  <div id="view-day"></div>
+  <div id="view-week"  style="display:none"></div>
+  <div id="view-month" style="display:none"></div>
+
+</div>
+
+<script>
+// ===== CONFIG =====
+
+const AREAS = [
+  {id:'corpo', label:'Corpo', habits:[
+    {id:'treino',  text:'Treinar'},
+    {id:'agua',    text:'Beber água'},
+  ]},
+  {id:'mente', label:'Mente', habits:[
+    {id:'meditar', text:'Meditar'},
+    {id:'ler',     text:'Ler'},
+  ]},
+  {id:'casa',  label:'Casa',  habits:[
+    {id:'arrumar', text:'Arrumar casa'},
+  ]},
+];
+
+const DAYS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+const SUBS = {
+  morning:   'cada manhã é uma segunda chance',
+  afternoon: 'o dia ainda tem muito a dar',
+  evening:   'consistência supera perfeição',
+};
+
+// ===== PERÍODO DO DIA =====
+
+const hr = new Date().getHours();
+const period = hr < 12 ? 'morning' : hr < 18 ? 'afternoon' : 'evening';
+document.getElementById('hsub').textContent = SUBS[period];
+
+// ===== STORAGE (Safari private mode safe) =====
+
+const Store = (() => {
+  let mem = {}, ok = false;
+  try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); ok = true; } catch(e){}
+  return {
+    get(k)   { try { return ok ? JSON.parse(localStorage.getItem(k) || 'null') : (mem[k] || null); } catch(e){ return null; }},
+    set(k,v) { try { if(ok) localStorage.setItem(k, JSON.stringify(v)); else mem[k] = v; } catch(e){ mem[k] = v; }},
+  };
+})();
+
+// ===== STATE =====
+
+const TODAY = new Date().toISOString().slice(0,10);
+
+let state = Store.get('ritual_v3') || {};
+if (!state.days)   state.days   = {};
+if (!state.habits) state.habits = {};
+if (!state.days[TODAY])   state.days[TODAY]   = {};
+if (!state.habits[TODAY]) state.habits[TODAY] = {};
+
+function save() { Store.set('ritual_v3', state); }
+
+// ===== VIEW =====
+
+function setView(v, btn) {
+  // FIX: usa o botão passado diretamente, não e.target (evita problema com nó de texto no iOS)
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.getElementById('view-day').style.display   = v === 'day'   ? 'block' : 'none';
+  document.getElementById('view-week').style.display  = v === 'week'  ? 'block' : 'none';
+  document.getElementById('view-month').style.display = v === 'month' ? 'block' : 'none';
+
+  if (v === 'week')  renderWeek();
+  if (v === 'month') renderMonth();
+}
+
+// ===== STEP FLOW =====
+
+let steps = [];
+let currentStep = 0;
+
+function buildSteps() {
+  steps = [];
+  AREAS.forEach(area => {
+    area.habits.forEach(h => {
+      steps.push({ areaId: area.id, areaLabel: area.label, habitId: h.id, text: h.text });
+    });
+  });
+  currentStep = 0; // FIX: sempre reseta junto com buildSteps
+}
+
+function getRoutineClass() {
+  return period; // morning | afternoon | evening
+}
+
+function renderStep() {
+  const container = document.getElementById('view-day');
+
+  if (currentStep >= steps.length) {
+    // TELA DE CONCLUSÃO com botão de restart
+    container.innerHTML = `
+      <div class="done-screen">
+        <div style="font-size:48px;margin-bottom:12px">🎉</div>
+        <div class="done-title">Dia concluído!</div>
+        <div class="done-sub">Todos os hábitos marcados.<br>Volte amanhã para manter a sequência.</div>
+        <button class="done-restart" onclick="restartSteps()">Revisar hábitos</button>
+      </div>
+    `;
+    return;
+  }
+
+  const s   = steps[currentStep];
+  const cls = getRoutineClass();
+  const total = steps.length;
+
+  container.innerHTML = `
+    <div class="routine ${cls}">
+      <div class="r-title">${s.areaLabel}</div>
+      <div class="step">
+        <div class="step-counter">${currentStep + 1} de ${total}</div>
+        <div class="step-title">${s.text}</div>
+        <button class="step-btn" onclick="completeStep()">✓ Feito</button>
+        <button class="step-skip" onclick="skipStep()">Pular por hoje</button>
+      </div>
+    </div>
+  `;
+}
+
+function completeStep() {
+  const s = steps[currentStep];
+  // FIX: usa habitId como chave, não o texto
+  if (!state.habits[TODAY][s.areaId]) state.habits[TODAY][s.areaId] = {};
+  state.habits[TODAY][s.areaId][s.habitId] = true;
+  state.days[TODAY][s.areaId] = (state.days[TODAY][s.areaId] || 0) + 1;
+  currentStep++;
+  save();
+  renderStep();
+}
+
+function skipStep() {
+  currentStep++;
+  renderStep();
+}
+
+function restartSteps() {
+  currentStep = 0;
+  renderStep();
+}
+
+// ===== WEEK =====
+
+function dayTotal(date) {
+  const d = state.habits[date] || {};
+  let total = 0;
+  Object.values(d).forEach(area => {
+    if (typeof area === 'object') total += Object.keys(area).length;
+  });
+  return total;
+}
+
+function renderWeek() {
+  const totalHabits = steps.length || 1;
+
+  // FIX: cria novo Date para cada dia em vez de mutar o mesmo objeto
+  const dates = Array.from({length:7}, (_,i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return d;
+  });
+
+  let html = '<div class="week-wrap"><div class="week-label">Últimos 7 dias</div><div class="week">';
+
+  dates.forEach(d => {
+    const key   = d.toISOString().slice(0,10);
+    const total = dayTotal(key);
+    const pct   = Math.min(Math.round((total / totalHabits) * 100), 100);
+    const dow   = d.getDay();
+    const isToday = key === TODAY;
+
+    html += `
+      <div class="wday${isToday ? ' today' : ''}">
+        <div class="wbar">
+          <div class="wbar-fill" style="height:${pct}%"></div>
+        </div>
+        <div class="wday-label">${DAYS_PT[dow]}</div>
+      </div>
+    `;
+  });
+
+  html += '</div></div>';
+  document.getElementById('view-week').innerHTML = html;
+}
+
+// ===== MONTH =====
+
+function renderMonth() {
+  const now  = new Date();
+  const year = now.getFullYear();
+  const mon  = now.getMonth();
+  const last = new Date(year, mon + 1, 0).getDate();
+
+  let html = '<div class="month-wrap"><div class="month-label">' +
+    now.toLocaleDateString('pt-BR', {month:'long', year:'numeric'}) +
+    '</div><div class="month-grid">';
+
+  for (let i = 1; i <= last; i++) {
+    // FIX: usa new Date com ano/mês/dia explícito para evitar problemas de fuso
+    const d   = new Date(year, mon, i);
+    const key = d.toISOString().slice(0,10);
+    const total = dayTotal(key);
+    const lvl   = total >= 4 ? 3 : total >= 2 ? 2 : total >= 1 ? 1 : 0;
+    html += `<div class="month-day l${lvl}" title="${key}"></div>`;
+  }
+
+  html += '</div></div>';
+  document.getElementById('view-month').innerHTML = html;
+}
+
+// ===== INIT =====
+buildSteps();
+renderStep();
+</script>
+</body>
+</html>
