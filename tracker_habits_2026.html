@@ -4,384 +4,1685 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>Ritual</title>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --dark:#0b0d11;
-  --c-morning:#fde68a;
-  --c-afternoon:#93c5fd;
-  --c-evening:#1e293b;
-}
+/* ── RESET ── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
 
-*{box-sizing:border-box;margin:0;padding:0;}
+/* ── TOKENS ── */
+:root{
+  --cream:#faf8f3;
+  --cream2:#f3f0e8;
+  --cream3:#ede8dc;
+  --sand:#d4c9b0;
+  --brown:#7c6a50;
+  --dark:#2a2118;
+  --text:#2a2118;
+  --muted:#9a8a74;
+  --muted2:#c4b89e;
+  --white:#ffffff;
+
+  --morning-bg:#fff8ed;
+  --morning-accent:#f59e0b;
+  --morning-light:#fef3c7;
+  --morning-text:#92400e;
+
+  --evening-bg:#f0f4ff;
+  --evening-accent:#6366f1;
+  --evening-light:#e0e7ff;
+  --evening-text:#3730a3;
+
+  --green:#16a34a;
+  --green-light:#dcfce7;
+  --red:#dc2626;
+  --red-light:#fee2e2;
+
+  --r:16px;
+  --rs:10px;
+  --shadow:0 1px 3px rgba(42,33,24,.08),0 4px 16px rgba(42,33,24,.04);
+  --shadow-md:0 4px 20px rgba(42,33,24,.1),0 1px 4px rgba(42,33,24,.06);
+}
 
 body{
   font-family:'DM Sans',sans-serif;
-  background:var(--dark);
-  color:white;
+  background:var(--cream);
+  color:var(--text);
   min-height:100vh;
+  overflow-x:hidden;
 }
 
-.app{
-  max-width:420px;
-  margin:auto;
-  padding:0 0 60px;
-  /* iOS safe area */
-  padding-top:env(safe-area-inset-top);
-  padding-bottom:calc(40px + env(safe-area-inset-bottom));
+/* ── SHELL ── */
+.shell{
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  background:var(--cream);
+  position:relative;
 }
 
-/* HEADER */
-.header{padding:30px 20px 10px;}
-.htitle{font-family:'Lora',serif;font-size:26px;font-weight:600;}
-.hsub{opacity:.6;font-size:13px;margin-top:4px;font-style:italic;}
+/* ── SCREENS ── */
+.screen{
+  display:none;
+  min-height:100vh;
+  padding-bottom:80px;
+  padding-top:env(safe-area-inset-top,0px);
+}
+.screen.active{display:block;}
 
-/* TABS */
-.tabs{display:flex;gap:8px;padding:10px 20px;}
-.tab{
-  flex:1;padding:10px;border-radius:999px;
-  border:1px solid #333;background:none;color:#aaa;
-  cursor:pointer;font-family:'DM Sans',sans-serif;
-  font-size:14px;font-weight:500;
-  transition:all .2s;
+/* ── BOTTOM NAV ── */
+.nav{
+  position:fixed;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:rgba(250,248,243,.92);
+  border-top:1px solid var(--cream3);
+  display:flex;
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));
+  z-index:100;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
 }
-.tab.active{background:#fff;color:#000;border-color:#fff;}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;cursor:pointer;
+  padding:4px 0;
+  color:var(--muted2);
+  font-family:'DM Sans',sans-serif;
+  font-size:10px;letter-spacing:.03em;
+  transition:color .2s;
+}
+.nav-btn.active{color:var(--brown);}
+.nav-icon{font-size:20px;line-height:1;}
 
-/* ROUTINE CARD */
-.routine{
-  margin:16px;border-radius:22px;padding:20px;
-  transition:background .4s;
+/* ── PAGE HEADER ── */
+.page-header{
+  padding:24px 20px 16px;
+  display:flex;align-items:flex-start;justify-content:space-between;
 }
-.routine.morning  {background:var(--c-morning);color:#422006;}
-.routine.afternoon{background:var(--c-afternoon);color:#1e3a5f;}
-.routine.evening  {background:var(--c-evening);color:#fff;border:1px solid #334155;}
+.page-header-left{}
+.pg-eyebrow{
+  font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;margin-bottom:5px;
+}
+.pg-title{
+  font-family:'Playfair Display',serif;
+  font-size:28px;font-weight:700;
+  line-height:1.15;color:var(--dark);
+}
+.pg-title em{font-style:italic;font-weight:400;}
+.pg-sub{font-size:13px;color:var(--muted);margin-top:4px;font-style:italic;}
+.page-header-right{
+  padding-top:4px;
+}
+.icon-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--white);border:1px solid var(--cream3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;box-shadow:var(--shadow);
+  transition:transform .15s;
+}
+.icon-btn:active{transform:scale(.93);}
 
-.r-title{
-  font-family:'Lora',serif;
-  font-size:18px;font-weight:600;margin-bottom:14px;
+/* ── CARDS ── */
+.card{
+  background:var(--white);
+  border-radius:var(--r);
+  border:1px solid var(--cream3);
+  box-shadow:var(--shadow);
+  overflow:hidden;
 }
 
-/* STEP */
-.step{text-align:center;padding:10px 0 4px;}
-.step-counter{
-  font-size:11px;letter-spacing:.12em;text-transform:uppercase;
-  opacity:.55;margin-bottom:14px;
+/* ── SECTION ── */
+.section{padding:0 16px;margin-bottom:20px;}
+.sec-label{
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;font-weight:500;
 }
-.step-title{font-size:20px;font-weight:600;margin-bottom:6px;}
-.step-area{font-size:12px;opacity:.55;margin-bottom:20px;}
 
-.step-btn{
-  margin-top:8px;padding:13px;width:100%;
-  border:none;border-radius:14px;
-  background:rgba(0,0,0,.18);color:inherit;
-  cursor:pointer;font-family:'DM Sans',sans-serif;
-  font-size:15px;font-weight:600;
-  transition:opacity .15s,transform .1s;
+/* ════════════════════════════════════════
+   HOME
+════════════════════════════════════════ */
+.hero-card{
+  margin:0 16px 20px;
+  border-radius:22px;
+  padding:24px;
+  position:relative;
+  overflow:hidden;
 }
-.step-btn:active{opacity:.75;transform:scale(.98);}
+.hero-card.morning{
+  background:linear-gradient(135deg,#fff8ed 0%,#fef3c7 100%);
+  border:1px solid #fde68a;
+}
+.hero-card.evening{
+  background:linear-gradient(135deg,#f0f4ff 0%,#e0e7ff 100%);
+  border:1px solid #c7d2fe;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:600;padding:4px 10px;border-radius:99px;
+  margin-bottom:14px;
+}
+.morning .hero-tag{background:rgba(245,158,11,.15);color:var(--morning-text);}
+.evening .hero-tag{background:rgba(99,102,241,.15);color:var(--evening-text);}
+.hero-greeting{
+  font-family:'Playfair Display',serif;
+  font-size:26px;font-weight:700;line-height:1.2;
+  margin-bottom:4px;
+}
+.morning .hero-greeting{color:#92400e;}
+.evening .hero-greeting{color:#3730a3;}
+.hero-sub{font-size:13px;margin-bottom:18px;opacity:.7;}
 
-.step-skip{
-  margin-top:8px;padding:10px;width:100%;
-  border:none;border-radius:14px;
-  background:transparent;color:inherit;
-  cursor:pointer;font-family:'DM Sans',sans-serif;
-  font-size:13px;opacity:.5;
-  transition:opacity .15s;
-}
-.step-skip:active{opacity:.3;}
+.hero-ring-row{display:flex;align-items:center;gap:16px;}
+.ring-wrap{position:relative;width:80px;height:80px;flex-shrink:0;}
+.ring-wrap svg{transform:rotate(-90deg);}
+.rtrack{fill:none;stroke:rgba(0,0,0,.08);stroke-width:6;}
+.rfill{fill:none;stroke-width:6;stroke-linecap:round;
+  stroke-dasharray:220;stroke-dashoffset:220;
+  transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1);}
+.morning .rfill{stroke:var(--morning-accent);}
+.evening .rfill{stroke:var(--evening-accent);}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1;}
+.ring-of{font-size:9px;opacity:.5;margin-top:1px;}
 
-/* DONE SCREEN */
-.done-screen{
-  text-align:center;
-  padding:40px 20px;
-}
-.done-title{
-  font-family:'Lora',serif;
-  font-size:26px;font-weight:600;margin-bottom:8px;
-}
-.done-sub{font-size:14px;opacity:.6;margin-bottom:28px;}
-.done-restart{
-  padding:13px 28px;border-radius:14px;
-  border:1px solid #333;background:none;color:#fff;
-  cursor:pointer;font-family:'DM Sans',sans-serif;
-  font-size:14px;font-weight:500;
-  transition:background .2s;
-}
-.done-restart:hover{background:#1a1a1a;}
+.hero-stats{flex:1;display:flex;flex-direction:column;gap:8px;}
+.hstat{display:flex;align-items:center;gap:8px;}
+.hstat-ico{font-size:15px;width:26px;text-align:center;}
+.hstat-val{font-size:13px;font-weight:500;}
+.hstat-lbl{font-size:11px;opacity:.55;}
 
-/* WEEK */
-.week-wrap{padding:20px;}
-.week-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.4;margin-bottom:12px;}
-.week{display:flex;gap:6px;}
-.wday{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+/* rituals row */
+.ritual-row{
+  display:flex;gap:10px;padding:0 16px;margin-bottom:20px;overflow-x:auto;
+  scrollbar-width:none;padding-bottom:4px;
 }
-.wbar{
-  width:100%;height:50px;border-radius:6px;background:#1a1a1a;
+.ritual-row::-webkit-scrollbar{display:none;}
+.ritual-chip{
+  flex-shrink:0;
+  border-radius:14px;padding:14px 16px;min-width:130px;
+  cursor:pointer;border:1px solid transparent;
+  transition:transform .15s,box-shadow .15s;
   position:relative;overflow:hidden;
 }
-.wbar-fill{
-  position:absolute;bottom:0;width:100%;
-  background:#22c55e;border-radius:6px;
-  transition:height .5s ease;
+.ritual-chip:active{transform:scale(.97);}
+.ritual-chip.morning-chip{
+  background:linear-gradient(135deg,#fff8ed,#fef3c7);
+  border-color:#fde68a;
 }
-.wday-label{font-size:9px;opacity:.4;text-transform:uppercase;letter-spacing:.05em;}
-.wday.today .wday-label{opacity:.8;color:#22c55e;}
-.wday.today .wbar{border:1px solid #22c55e33;}
+.ritual-chip.evening-chip{
+  background:linear-gradient(135deg,#f0f4ff,#e0e7ff);
+  border-color:#c7d2fe;
+}
+.rc-emoji{font-size:22px;margin-bottom:6px;display:block;}
+.rc-name{font-size:13px;font-weight:600;display:block;}
+.morning-chip .rc-name{color:var(--morning-text);}
+.evening-chip .rc-name{color:var(--evening-text);}
+.rc-prog{font-size:11px;opacity:.6;display:block;margin-top:2px;}
+.rc-bar{height:3px;border-radius:2px;background:rgba(0,0,0,.08);margin-top:8px;overflow:hidden;}
+.rc-bar-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.morning-chip .rc-bar-fill{background:var(--morning-accent);}
+.evening-chip .rc-bar-fill{background:var(--evening-accent);}
 
-/* MONTH */
-.month-wrap{padding:20px;}
-.month-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.4;margin-bottom:12px;}
+/* area cards */
+.area-card{
+  background:var(--white);border:1px solid var(--cream3);
+  border-radius:var(--r);box-shadow:var(--shadow);
+  margin-bottom:10px;overflow:hidden;
+  transition:box-shadow .2s;
+}
+.area-head{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;cursor:pointer;
+}
+.area-ico{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.area-ico.corpo   {background:#fef3c7;}
+.area-ico.mente   {background:#e0e7ff;}
+.area-ico.relac   {background:#fce7f3;}
+.area-ico.casa    {background:#dcfce7;}
+.area-ico.trabalho{background:#e0f2fe;}
+
+.area-title{flex:1;}
+.area-name{font-size:15px;font-weight:600;}
+.area-prog{font-size:11.5px;color:var(--muted);margin-top:1px;}
+.area-chevron{font-size:12px;color:var(--muted2);transition:transform .25s;}
+.area-card.open .area-chevron{transform:rotate(90deg);}
+
+.area-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .3s cubic-bezier(.4,0,.2,1);
+}
+.area-card.open .area-body{max-height:2000px;}
+
+.habit-list{border-top:1px solid var(--cream3);}
+.habit-row{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px;
+  border-bottom:1px solid var(--cream3);
+  transition:background .15s;
+}
+.habit-row:last-child{border-bottom:none;}
+.habit-row:active{background:var(--cream);}
+.hbox{
+  width:20px;height:20px;border-radius:6px;
+  border:1.5px solid var(--cream3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:transparent;flex-shrink:0;
+  cursor:pointer;transition:all .18s;
+  background:var(--white);
+}
+.hbox.done{background:var(--green);border-color:var(--green);color:#fff;}
+.htxt{flex:1;font-size:14px;}
+.htxt.done{color:var(--muted);text-decoration:line-through;}
+.hdel-btn{
+  background:none;border:none;color:var(--muted2);
+  cursor:pointer;font-size:14px;padding:2px 4px;
+  opacity:0;transition:opacity .2s;
+}
+.habit-row:hover .hdel-btn{opacity:1;}
+
+.area-add{
+  display:flex;gap:8px;padding:10px 16px 14px;
+}
+.area-add-inp{
+  flex:1;background:var(--cream);border:1px solid var(--cream3);
+  border-radius:8px;padding:8px 12px;
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  color:var(--text);outline:none;
+  transition:border-color .2s;
+}
+.area-add-inp::placeholder{color:var(--muted2);}
+.area-add-inp:focus{border-color:var(--brown);}
+.area-add-btn{
+  background:var(--dark);color:var(--white);
+  border:none;border-radius:8px;padding:8px 14px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;transition:opacity .15s;white-space:nowrap;
+}
+.area-add-btn:active{opacity:.75;}
+
+/* week bars */
+.week-row{display:flex;gap:6px;justify-content:space-between;}
+.wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.wbar{width:100%;height:48px;border-radius:6px;background:var(--cream2);
+  position:relative;overflow:hidden;}
+.wbar-fill{position:absolute;bottom:0;width:100%;
+  background:linear-gradient(180deg,var(--brown),var(--sand));
+  border-radius:6px;transition:height .5s ease;}
+.wday.today .wbar{border:1.5px solid var(--brown);}
+.wday-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.wday.today .wday-lbl{color:var(--brown);font-weight:600;}
+
+/* ════════════════════════════════════════
+   RITUAL SCREEN (morning / evening flow)
+════════════════════════════════════════ */
+.ritual-screen-wrap{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+.ritual-hero{
+  padding:40px 24px 28px;
+  text-align:center;
+}
+.ritual-hero.morning{background:linear-gradient(180deg,#fff8ed 0%,#faf8f3 100%);}
+.ritual-hero.evening{background:linear-gradient(180deg,#f0f4ff 0%,#faf8f3 100%);}
+.rh-emoji{font-size:48px;margin-bottom:12px;display:block;}
+.rh-label{
+  font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:600;margin-bottom:8px;
+}
+.morning .rh-label,.rh-label.morning{color:var(--morning-text);}
+.evening .rh-label,.rh-label.evening{color:var(--evening-text);}
+.rh-title{
+  font-family:'Playfair Display',serif;
+  font-size:28px;font-weight:700;
+  margin-bottom:4px;
+}
+.rh-sub{font-size:13px;color:var(--muted);font-style:italic;}
+
+.step-progress-bar{
+  height:3px;background:var(--cream3);
+  margin:0 24px;border-radius:2px;overflow:hidden;
+}
+.step-progress-fill{
+  height:100%;border-radius:2px;
+  transition:width .4s ease;
+}
+.morning-flow .step-progress-fill{background:var(--morning-accent);}
+.evening-flow .step-progress-fill{background:var(--evening-accent);}
+
+.step-card{
+  flex:1;margin:16px;
+}
+.step-inner{
+  background:var(--white);border:1px solid var(--cream3);
+  border-radius:20px;box-shadow:var(--shadow-md);
+  padding:28px 24px;text-align:center;
+}
+.step-num{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;}
+.step-title{
+  font-family:'Playfair Display',serif;
+  font-size:24px;font-weight:700;margin-bottom:8px;
+}
+.step-area{font-size:12.5px;color:var(--muted);margin-bottom:24px;}
+.step-done-btn{
+  width:100%;padding:14px;border-radius:14px;border:none;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:transform .1s,opacity .15s;
+  margin-bottom:8px;
+}
+.step-done-btn:active{transform:scale(.98);opacity:.85;}
+.morning-flow .step-done-btn{background:var(--morning-accent);color:#fff;}
+.evening-flow .step-done-btn{background:var(--evening-accent);color:#fff;}
+.step-skip-btn{
+  width:100%;padding:10px;border-radius:14px;
+  border:1px solid var(--cream3);
+  background:none;color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  cursor:pointer;transition:background .15s;
+}
+.step-skip-btn:active{background:var(--cream);}
+
+.ritual-done{
+  text-align:center;padding:40px 24px;
+}
+.rd-emoji{font-size:56px;display:block;margin-bottom:16px;}
+.rd-title{
+  font-family:'Playfair Display',serif;
+  font-size:28px;font-weight:700;margin-bottom:8px;
+}
+.rd-sub{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+.rd-streak{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--cream2);border-radius:99px;
+  padding:8px 18px;font-size:13px;font-weight:500;
+  margin-bottom:24px;
+}
+.rd-btn{
+  display:block;width:100%;padding:14px;border-radius:14px;
+  border:1px solid var(--cream3);background:var(--white);
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  color:var(--dark);cursor:pointer;
+  box-shadow:var(--shadow);transition:transform .1s;
+}
+.rd-btn:active{transform:scale(.98);}
+
+/* ════════════════════════════════════════
+   MÊS
+════════════════════════════════════════ */
 .month-grid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:5px;
+  display:grid;grid-template-columns:repeat(7,1fr);gap:5px;
 }
-.month-day{
-  aspect-ratio:1;border-radius:5px;
-  background:#1a1a1a;
-  transition:background .3s;
+.mday{
+  aspect-ratio:1;border-radius:5px;background:var(--cream2);
+  position:relative;cursor:default;
+  transition:transform .1s;
 }
-.l1{background:#166534;}
-.l2{background:#22c55e;}
-.l3{background:#4ade80;}
+.mday.l1{background:#bbf7d0;}
+.mday.l2{background:#4ade80;}
+.mday.l3{background:#16a34a;}
+.mday.today{box-shadow:0 0 0 2px var(--brown);}
+.month-legend{
+  display:flex;align-items:center;gap:6px;
+  justify-content:flex-end;margin-bottom:12px;
+  font-size:11px;color:var(--muted);
+}
+.legend-sq{width:12px;height:12px;border-radius:3px;}
+
+/* stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.stat-card{
+  background:var(--white);border:1px solid var(--cream3);
+  border-radius:var(--r);padding:16px;box-shadow:var(--shadow);
+}
+.stat-val{
+  font-family:'Playfair Display',serif;
+  font-size:30px;font-weight:700;line-height:1;
+  margin-bottom:4px;
+}
+.stat-lbl{font-size:11.5px;color:var(--muted);}
+
+/* ════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════ */
+.config-section{margin-bottom:24px;}
+.config-section-title{
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);padding:0 16px;margin-bottom:8px;font-weight:500;
+}
+.config-row{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;background:var(--white);
+  border-bottom:1px solid var(--cream3);
+}
+.config-row:first-of-type{border-radius:var(--r) var(--r) 0 0;}
+.config-row:last-of-type{border-radius:0 0 var(--r) var(--r);border-bottom:none;}
+.config-row:only-of-type{border-radius:var(--r);border-bottom:none;}
+.config-row-ico{font-size:18px;width:28px;text-align:center;}
+.config-row-body{flex:1;}
+.config-row-title{font-size:14px;font-weight:500;}
+.config-row-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.config-row-right{color:var(--muted2);font-size:13px;}
+
+/* toggle */
+.toggle{
+  width:44px;height:26px;border-radius:13px;
+  background:var(--cream3);position:relative;cursor:pointer;
+  transition:background .2s;border:none;flex-shrink:0;
+}
+.toggle.on{background:#16a34a;}
+.toggle::after{
+  content:'';
+  position:absolute;top:3px;left:3px;
+  width:20px;height:20px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:transform .2s;
+}
+.toggle.on::after{transform:translateX(18px);}
+
+/* time input */
+.time-inp{
+  background:var(--cream);border:1px solid var(--cream3);
+  border-radius:8px;padding:6px 10px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  color:var(--dark);outline:none;width:82px;text-align:center;
+  transition:border-color .2s;
+}
+.time-inp:focus{border-color:var(--brown);}
+
+/* area chips (config) */
+.area-chip-row{
+  display:flex;gap:8px;padding:0 16px;
+  overflow-x:auto;scrollbar-width:none;margin-bottom:12px;
+}
+.area-chip-row::-webkit-scrollbar{display:none;}
+.area-chip{
+  flex-shrink:0;padding:7px 16px;border-radius:99px;
+  background:var(--white);border:1px solid var(--cream3);
+  font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;
+  color:var(--muted);cursor:pointer;transition:all .15s;
+  white-space:nowrap;
+}
+.area-chip.sel{background:var(--dark);border-color:var(--dark);color:#fff;}
+
+/* habit edit list */
+.habit-edit-wrap{margin:0 16px;}
+.habit-edit-row{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;background:var(--white);
+  border-bottom:1px solid var(--cream3);
+}
+.habit-edit-row:first-child{border-radius:var(--r) var(--r) 0 0;}
+.habit-edit-row:last-child{border-radius:0 0 var(--r) var(--r);border-bottom:none;}
+.habit-edit-row:only-child{border-radius:var(--r);border-bottom:none;}
+.he-drag{color:var(--muted2);font-size:14px;cursor:grab;}
+.he-txt{flex:1;font-size:14px;}
+.he-badge{
+  font-size:10px;padding:2px 8px;border-radius:99px;
+  font-weight:500;
+}
+.he-badge.morning{background:var(--morning-light);color:var(--morning-text);}
+.he-badge.evening{background:var(--evening-light);color:var(--evening-text);}
+.he-del{
+  background:none;border:none;color:var(--muted2);
+  cursor:pointer;font-size:15px;padding:2px 4px;
+  transition:color .15s;
+}
+.he-del:active{color:var(--red);}
+
+.habit-add-form{
+  display:flex;flex-direction:column;gap:8px;
+  margin:10px 16px 0;
+  padding:14px;background:var(--white);
+  border:1px solid var(--cream3);border-radius:var(--r);
+  box-shadow:var(--shadow);
+}
+.hab-inp{
+  background:var(--cream);border:1px solid var(--cream3);
+  border-radius:8px;padding:9px 12px;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  color:var(--text);outline:none;
+  transition:border-color .2s;
+}
+.hab-inp:focus{border-color:var(--brown);}
+.hab-row{display:flex;gap:8px;}
+.hab-select{
+  flex:1;background:var(--cream);border:1px solid var(--cream3);
+  border-radius:8px;padding:9px 12px;
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  color:var(--text);outline:none;
+  appearance:none;
+}
+.hab-add-btn{
+  background:var(--dark);color:#fff;border:none;
+  border-radius:8px;padding:9px 18px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:opacity .15s;white-space:nowrap;
+}
+.hab-add-btn:active{opacity:.75;}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes checkPop{
+  0%{transform:scale(1);}
+  40%{transform:scale(1.5);}
+  70%{transform:scale(.88);}
+  100%{transform:scale(1);}
+}
+@keyframes toastIn{
+  from{opacity:0;transform:translateX(-50%) translateY(16px);}
+  to{opacity:1;transform:translateX(-50%) translateY(0);}
+}
+.fade-up{animation:fadeUp .35s ease backwards;}
+.check-pop{animation:checkPop .3s cubic-bezier(.4,0,.2,1);}
+
+/* toast */
+.toast{
+  position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));
+  left:50%;transform:translateX(-50%);
+  background:var(--dark);color:#fff;
+  border-radius:99px;padding:10px 20px;
+  font-size:13px;font-weight:500;
+  white-space:nowrap;z-index:200;
+  animation:toastIn .3s ease;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+}
+
+/* ritual switcher (top of ritual screen) */
+.ritual-switch{
+  display:flex;gap:6px;padding:0 16px 16px;
+}
+.rs-btn{
+  flex:1;padding:9px;border-radius:10px;
+  border:1px solid var(--cream3);background:none;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  color:var(--muted);cursor:pointer;transition:all .18s;
+}
+.rs-btn.active.morning{background:var(--morning-light);border-color:#fde68a;color:var(--morning-text);}
+.rs-btn.active.evening{background:var(--evening-light);border-color:#c7d2fe;color:var(--evening-text);}
 </style>
 </head>
 <body>
 
-<div class="app">
+<div class="shell">
 
-  <div class="header">
-    <div class="htitle">Seu Ritual</div>
-    <div class="hsub" id="hsub">consistência &gt; intensidade</div>
+  <!-- ═══════ HOME ═══════ -->
+  <div id="screen-home" class="screen active">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="pg-eyebrow" id="home-date"></div>
+        <div class="pg-title">Seu <em>Ritual</em></div>
+        <div class="pg-sub" id="home-sub"></div>
+      </div>
+      <div class="page-header-right">
+        <div class="icon-btn" onclick="goScreen('config')">⚙️</div>
+      </div>
+    </div>
+
+    <!-- hero ring -->
+    <div class="hero-card" id="hero-card">
+      <div class="hero-tag" id="hero-tag"></div>
+      <div class="hero-greeting" id="hero-greeting"></div>
+      <div class="hero-sub" id="hero-sub"></div>
+      <div class="hero-ring-row">
+        <div class="ring-wrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="rtrack" cx="40" cy="40" r="33"/>
+            <circle class="rfill" id="home-ring" cx="40" cy="40" r="33"
+              stroke-dasharray="207" stroke-dashoffset="207"/>
+          </svg>
+          <div class="ring-label">
+            <div class="ring-num" id="home-pts">0</div>
+            <div class="ring-of" id="home-of">de 0</div>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="hstat">
+            <div class="hstat-ico">🔥</div>
+            <div>
+              <div class="hstat-val" id="home-streak">0 dias</div>
+              <div class="hstat-lbl">sequência</div>
+            </div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-ico">📅</div>
+            <div>
+              <div class="hstat-val" id="home-week">0 pts</div>
+              <div class="hstat-lbl">esta semana</div>
+            </div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-ico">⭐</div>
+            <div>
+              <div class="hstat-val" id="home-level">—</div>
+              <div class="hstat-lbl">nível</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ritual chips -->
+    <div class="ritual-row">
+      <div class="ritual-chip morning-chip" onclick="goRitual('morning')">
+        <span class="rc-emoji">☀️</span>
+        <span class="rc-name">Ritual Matinal</span>
+        <span class="rc-prog" id="chip-morning-prog">0 hábitos</span>
+        <div class="rc-bar"><div class="rc-bar-fill" id="chip-morning-bar" style="width:0%"></div></div>
+      </div>
+      <div class="ritual-chip evening-chip" onclick="goRitual('evening')">
+        <span class="rc-emoji">🌙</span>
+        <span class="rc-name">Ritual Noturno</span>
+        <span class="rc-prog" id="chip-evening-prog">0 hábitos</span>
+        <div class="rc-bar"><div class="rc-bar-fill" id="chip-evening-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- áreas -->
+    <div class="section">
+      <div class="sec-label">Todas as áreas</div>
+      <div id="areas-home"></div>
+    </div>
+
+    <!-- semana -->
+    <div class="section">
+      <div class="sec-label">Esta semana</div>
+      <div class="card" style="padding:16px">
+        <div class="week-row" id="home-week-row"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" data-view="day"   onclick="setView('day',   this)">Hoje</button>
-    <button class="tab"        data-view="week"  onclick="setView('week',  this)">Semana</button>
-    <button class="tab"        data-view="month" onclick="setView('month', this)">Mês</button>
+  <!-- ═══════ RITUAL ═══════ -->
+  <div id="screen-ritual" class="screen">
+    <div style="padding:16px 16px 0;display:flex;align-items:center;gap:10px;">
+      <div class="icon-btn" onclick="goScreen('home')">←</div>
+      <div style="flex:1;font-size:13px;color:var(--muted);font-weight:500;">Modo ritual</div>
+    </div>
+
+    <!-- switcher morning/evening -->
+    <div class="ritual-switch" style="margin-top:10px;">
+      <button class="rs-btn active morning" id="rs-morning" onclick="setRitual('morning')">☀️ Matinal</button>
+      <button class="rs-btn evening" id="rs-evening" onclick="setRitual('evening')">🌙 Noturno</button>
+    </div>
+
+    <div id="ritual-content"></div>
   </div>
 
-  <div id="view-day"></div>
-  <div id="view-week"  style="display:none"></div>
-  <div id="view-month" style="display:none"></div>
+  <!-- ═══════ MÊS ═══════ -->
+  <div id="screen-month" class="screen">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="pg-eyebrow">Histórico</div>
+        <div class="pg-title">Este <em>Mês</em></div>
+      </div>
+    </div>
 
-</div>
+    <div class="section">
+      <div class="stats-grid" id="month-stats" style="margin-bottom:16px;"></div>
+      <div class="sec-label">Calendário de hábitos</div>
+      <div class="card" style="padding:16px;">
+        <div class="month-legend">
+          <span>menos</span>
+          <div class="legend-sq" style="background:var(--cream2)"></div>
+          <div class="legend-sq" style="background:#bbf7d0"></div>
+          <div class="legend-sq" style="background:#4ade80"></div>
+          <div class="legend-sq" style="background:#16a34a"></div>
+          <span>mais</span>
+        </div>
+        <div class="month-grid" id="month-grid"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-label">Missões da semana</div>
+      <div id="missions-wrap"></div>
+    </div>
+  </div>
+
+  <!-- ═══════ CONFIG ═══════ -->
+  <div id="screen-config" class="screen">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="pg-eyebrow">Personalizar</div>
+        <div class="pg-title"><em>Config</em></div>
+      </div>
+      <div class="page-header-right">
+        <div class="icon-btn" onclick="goScreen('home')">✕</div>
+      </div>
+    </div>
+
+    <!-- notificações -->
+    <div class="config-section">
+      <div class="config-section-title">Notificações</div>
+      <div style="margin:0 16px;background:var(--white);border:1px solid var(--cream3);border-radius:var(--r);overflow:hidden;">
+        <div class="config-row">
+          <div class="config-row-ico">☀️</div>
+          <div class="config-row-body">
+            <div class="config-row-title">Ritual matinal</div>
+            <div class="config-row-sub">Lembrete para iniciar a manhã</div>
+          </div>
+          <input class="time-inp" type="time" id="notif-morning" value="06:00" onchange="saveNotifTime('morning',this.value)"/>
+          <button class="toggle on" id="tog-morning" onclick="toggleNotif('morning',this)"></button>
+        </div>
+        <div class="config-row" style="border-top:1px solid var(--cream3);">
+          <div class="config-row-ico">🌙</div>
+          <div class="config-row-body">
+            <div class="config-row-title">Ritual noturno</div>
+            <div class="config-row-sub">Lembrete para encerrar o dia</div>
+          </div>
+          <input class="time-inp" type="time" id="notif-evening" value="21:00" onchange="saveNotifTime('evening',this.value)"/>
+          <button class="toggle on" id="tog-evening" onclick="toggleNotif('evening',this)"></button>
+        </div>
+        <div class="config-row" style="border-top:1px solid var(--cream3);">
+          <div class="config-row-ico">📊</div>
+          <div class="config-row-body">
+            <div class="config-row-title">Resumo diário</div>
+            <div class="config-row-sub">Como foi o seu dia às 22h</div>
+          </div>
+          <button class="toggle on" id="tog-summary" onclick="toggleNotif('summary',this)"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- rituals config -->
+    <div class="config-section">
+      <div class="config-section-title">Configurar rituais</div>
+      <div style="margin:0 16px;background:var(--white);border:1px solid var(--cream3);border-radius:var(--r);overflow:hidden;">
+        <div class="config-row" onclick="goScreen('config-ritual-morning')" style="cursor:pointer;">
+          <div class="config-row-ico">☀️</div>
+          <div class="config-row-body">
+            <div class="config-row-title">Ritual matinal</div>
+            <div class="config-row-sub" id="cfg-morning-count">0 hábitos</div>
+          </div>
+          <div class="config-row-right">›</div>
+        </div>
+        <div class="config-row" onclick="goScreen('config-ritual-evening')" style="cursor:pointer;border-top:1px solid var(--cream3);">
+          <div class="config-row-ico">🌙</div>
+          <div class="config-row-body">
+            <div class="config-row-title">Ritual noturno</div>
+            <div class="config-row-sub" id="cfg-evening-count">0 hábitos</div>
+          </div>
+          <div class="config-row-right">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- editar hábitos por área -->
+    <div class="config-section">
+      <div class="config-section-title">Hábitos por área</div>
+      <div class="area-chip-row" id="cfg-area-chips"></div>
+      <div class="habit-edit-wrap" id="cfg-habit-list"></div>
+      <div class="habit-add-form" id="cfg-add-form">
+        <input class="hab-inp" id="cfg-hab-inp" placeholder="Nome do hábito…"/>
+        <div class="hab-row">
+          <select class="hab-select" id="cfg-hab-period">
+            <option value="morning">☀️ Matinal</option>
+            <option value="evening">🌙 Noturno</option>
+            <option value="any">🔄 Qualquer horário</option>
+          </select>
+          <button class="hab-add-btn" onclick="cfgAddHabit()">Adicionar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- resetar -->
+    <div class="config-section">
+      <div class="config-section-title">Dados</div>
+      <div style="margin:0 16px;background:var(--white);border:1px solid var(--cream3);border-radius:var(--r);overflow:hidden;">
+        <div class="config-row" onclick="resetToday()" style="cursor:pointer;">
+          <div class="config-row-ico">🔄</div>
+          <div class="config-row-body">
+            <div class="config-row-title">Resetar dia atual</div>
+            <div class="config-row-sub">Limpa os checkmarks de hoje</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ CONFIG RITUAL ═══════ -->
+  <div id="screen-config-ritual-morning" class="screen">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="pg-eyebrow">Editar</div>
+        <div class="pg-title">☀️ <em>Matinal</em></div>
+      </div>
+      <div class="page-header-right">
+        <div class="icon-btn" onclick="goScreen('config')">←</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-label">Hábitos do ritual matinal (arraste para reordenar)</div>
+      <div class="habit-edit-wrap" id="morning-ritual-list"></div>
+      <div style="height:12px"></div>
+      <div class="habit-add-form">
+        <input class="hab-inp" id="morning-ritual-inp" placeholder="Adicionar hábito ao ritual matinal…"/>
+        <button class="hab-add-btn" style="width:100%;margin-top:4px;" onclick="addRitualHabit('morning')">+ Adicionar</button>
+      </div>
+    </div>
+  </div>
+  <div id="screen-config-ritual-evening" class="screen">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="pg-eyebrow">Editar</div>
+        <div class="pg-title">🌙 <em>Noturno</em></div>
+      </div>
+      <div class="page-header-right">
+        <div class="icon-btn" onclick="goScreen('config')">←</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-label">Hábitos do ritual noturno</div>
+      <div class="habit-edit-wrap" id="evening-ritual-list"></div>
+      <div style="height:12px"></div>
+      <div class="habit-add-form">
+        <input class="hab-inp" id="evening-ritual-inp" placeholder="Adicionar hábito ao ritual noturno…"/>
+        <button class="hab-add-btn" style="width:100%;margin-top:4px;" onclick="addRitualHabit('evening')">+ Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="nav">
+    <button class="nav-btn active" id="nav-home" onclick="goScreen('home')">
+      <span class="nav-icon">🏠</span>
+      <span>Início</span>
+    </button>
+    <button class="nav-btn" id="nav-ritual" onclick="goScreen('ritual')">
+      <span class="nav-icon">✨</span>
+      <span>Ritual</span>
+    </button>
+    <button class="nav-btn" id="nav-month" onclick="goScreen('month')">
+      <span class="nav-icon">📅</span>
+      <span>Mês</span>
+    </button>
+    <button class="nav-btn" id="nav-config" onclick="goScreen('config')">
+      <span class="nav-icon">⚙️</span>
+      <span>Config</span>
+    </button>
+  </nav>
+
+</div><!-- /shell -->
 
 <script>
-// ===== CONFIG =====
-
-const AREAS = [
-  {id:'corpo', label:'Corpo', habits:[
-    {id:'treino',  text:'Treinar'},
-    {id:'agua',    text:'Beber água'},
-  ]},
-  {id:'mente', label:'Mente', habits:[
-    {id:'meditar', text:'Meditar'},
-    {id:'ler',     text:'Ler'},
-  ]},
-  {id:'casa',  label:'Casa',  habits:[
-    {id:'arrumar', text:'Arrumar casa'},
-  ]},
+// ═══════════════════════════════════════
+//  CONFIG PADRÃO
+// ═══════════════════════════════════════
+const DEFAULT_AREAS = [
+  {id:'corpo',   label:'Corpo',          icon:'🏋️', cls:'corpo'},
+  {id:'mente',   label:'Mente',          icon:'🧠', cls:'mente'},
+  {id:'relac',   label:'Relacionamento', icon:'❤️', cls:'relac'},
+  {id:'casa',    label:'Casa',           icon:'🏠', cls:'casa'},
+  {id:'trabalho',label:'Trabalho',       icon:'💼', cls:'trabalho'},
 ];
 
-const DAYS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DEFAULT_HABITS = [
+  {id:'h1', areaId:'corpo',    text:'Treinar',                period:'morning'},
+  {id:'h2', areaId:'corpo',    text:'Caminhar ao ar livre',   period:'morning'},
+  {id:'h3', areaId:'corpo',    text:'Beber 2L de água',       period:'any'},
+  {id:'h4', areaId:'corpo',    text:'Dormir 7-8h',            period:'evening'},
+  {id:'h5', areaId:'mente',    text:'Meditar 10 min',         period:'morning'},
+  {id:'h6', areaId:'mente',    text:'Ler 20 min',             period:'evening'},
+  {id:'h7', areaId:'mente',    text:'Escrever no diário',     period:'evening'},
+  {id:'h8', areaId:'relac',    text:'Mensagem para alguém',   period:'any'},
+  {id:'h9', areaId:'relac',    text:'Gratidão — 3 itens',     period:'evening'},
+  {id:'h10',areaId:'casa',     text:'Arrumar a cama',         period:'morning'},
+  {id:'h11',areaId:'casa',     text:'Limpeza rápida',         period:'morning'},
+  {id:'h12',areaId:'trabalho', text:'Revisar lista de tarefas',period:'morning'},
+  {id:'h13',areaId:'trabalho', text:'Desconectar do trabalho', period:'evening'},
+];
 
+const DEFAULT_RITUALS = {
+  morning: ['h1','h5','h10','h12'],
+  evening: ['h4','h6','h7','h9','h13'],
+};
+
+const DAYS_PT  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const LEVELS   = [
+  {min:0,  max:10, e:'🌱', t:'Iniciando'},
+  {min:11, max:24, e:'⚡', t:'Em ritmo'},
+  {min:25, max:40, e:'🔥', t:'Consistente'},
+  {min:41, max:99, e:'🚀', t:'Elite'},
+];
 const SUBS = {
   morning:   'cada manhã é uma segunda chance',
   afternoon: 'o dia ainda tem muito a dar',
   evening:   'consistência supera perfeição',
 };
 
-// ===== PERÍODO DO DIA =====
-
-const hr = new Date().getHours();
-const period = hr < 12 ? 'morning' : hr < 18 ? 'afternoon' : 'evening';
-document.getElementById('hsub').textContent = SUBS[period];
-
-// ===== STORAGE (Safari private mode safe) =====
-
+// ═══════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════
 const Store = (() => {
   let mem = {}, ok = false;
   try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); ok = true; } catch(e){}
   return {
-    get(k)   { try { return ok ? JSON.parse(localStorage.getItem(k) || 'null') : (mem[k] || null); } catch(e){ return null; }},
-    set(k,v) { try { if(ok) localStorage.setItem(k, JSON.stringify(v)); else mem[k] = v; } catch(e){ mem[k] = v; }},
+    get(k)    { try { return ok ? JSON.parse(localStorage.getItem(k)||'null') : mem[k]||null; } catch(e){ return null; }},
+    set(k,v)  { try { if(ok) localStorage.setItem(k, JSON.stringify(v)); else mem[k]=v; } catch(e){ mem[k]=v; }},
   };
 })();
 
-// ===== STATE =====
-
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
 const TODAY = new Date().toISOString().slice(0,10);
+const hr    = new Date().getHours();
+const period = hr < 12 ? 'morning' : hr < 18 ? 'afternoon' : 'evening';
 
-let state = Store.get('ritual_v3') || {};
-if (!state.days)   state.days   = {};
-if (!state.habits) state.habits = {};
-if (!state.days[TODAY])   state.days[TODAY]   = {};
+let state = Store.get('ritual_full') || {};
+if (!state.habits)      state.habits      = {};     // {date:{habitId:bool}}
+if (!state.settings)    state.settings    = {};
+if (!state.customHabits) state.customHabits = [];   // [{id,areaId,text,period}]
+if (!state.rituals)     state.rituals     = JSON.parse(JSON.stringify(DEFAULT_RITUALS));
+if (!state.notifTimes)  state.notifTimes  = {morning:'06:00',evening:'21:00'};
+if (!state.notifOn)     state.notifOn     = {morning:true, evening:true, summary:true};
+if (!state.ritualStep)  state.ritualStep  = {morning:0, evening:0};
 if (!state.habits[TODAY]) state.habits[TODAY] = {};
 
-function save() { Store.set('ritual_v3', state); }
+function save() { Store.set('ritual_full', state); }
 
-// ===== VIEW =====
-
-function setView(v, btn) {
-  // FIX: usa o botão passado diretamente, não e.target (evita problema com nó de texto no iOS)
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-
-  document.getElementById('view-day').style.display   = v === 'day'   ? 'block' : 'none';
-  document.getElementById('view-week').style.display  = v === 'week'  ? 'block' : 'none';
-  document.getElementById('view-month').style.display = v === 'month' ? 'block' : 'none';
-
-  if (v === 'week')  renderWeek();
-  if (v === 'month') renderMonth();
+// ═══════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════
+function getAllHabits() {
+  return [...DEFAULT_HABITS, ...state.customHabits];
 }
 
-// ===== STEP FLOW =====
+function getAreaHabits(areaId) {
+  return getAllHabits().filter(h => h.areaId === areaId);
+}
 
-let steps = [];
-let currentStep = 0;
+function getRitualHabits(ritualPeriod) {
+  const ids  = state.rituals[ritualPeriod] || [];
+  const all  = getAllHabits();
+  return ids.map(id => all.find(h => h.id === id)).filter(Boolean);
+}
 
-function buildSteps() {
-  steps = [];
-  AREAS.forEach(area => {
-    area.habits.forEach(h => {
-      steps.push({ areaId: area.id, areaLabel: area.label, habitId: h.id, text: h.text });
-    });
+function dayDone(date) {
+  return Object.values(state.habits[date] || {}).filter(Boolean).length;
+}
+
+function dayTotal(date) {
+  return getAllHabits().length;
+}
+
+function calcStreak() {
+  let s = 0;
+  const keys = Object.keys(state.habits).sort().reverse();
+  for (const k of keys) {
+    if (dayDone(k) >= 4) s++;
+    else break;
+  }
+  return s;
+}
+
+function weekDates() {
+  return Array.from({length:7}, (_,i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6-i));
+    return d.toISOString().slice(0,10);
   });
-  currentStep = 0; // FIX: sempre reseta junto com buildSteps
 }
 
-function getRoutineClass() {
-  return period; // morning | afternoon | evening
+function weekTotal() {
+  return weekDates().reduce((s,d) => s + dayDone(d), 0);
 }
 
-function renderStep() {
-  const container = document.getElementById('view-day');
+function getLevel(wt) {
+  return LEVELS.find(l => wt >= l.min && wt <= l.max) || LEVELS[0];
+}
 
-  if (currentStep >= steps.length) {
-    // TELA DE CONCLUSÃO com botão de restart
-    container.innerHTML = `
-      <div class="done-screen">
-        <div style="font-size:48px;margin-bottom:12px">🎉</div>
-        <div class="done-title">Dia concluído!</div>
-        <div class="done-sub">Todos os hábitos marcados.<br>Volte amanhã para manter a sequência.</div>
-        <button class="done-restart" onclick="restartSteps()">Revisar hábitos</button>
+function uid() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+
+// ═══════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════
+const NAV_SCREENS = ['home','ritual','month','config'];
+
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const navId = 'nav-' + (id.startsWith('config') ? 'config' : id);
+  const navBtn = document.getElementById(navId);
+  if (navBtn) navBtn.classList.add('active');
+
+  if (id === 'home')   renderHome();
+  if (id === 'ritual') renderRitualScreen();
+  if (id === 'month')  renderMonth();
+  if (id === 'config') renderConfig();
+  if (id === 'config-ritual-morning') renderRitualConfig('morning');
+  if (id === 'config-ritual-evening') renderRitualConfig('evening');
+
+  window.scrollTo(0,0);
+}
+
+function goRitual(p) {
+  currentRitual = p;
+  goScreen('ritual');
+}
+
+// ═══════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════
+function renderHome() {
+  // period
+  const cls = period === 'afternoon' ? 'morning' : period;
+  document.getElementById('home-date').textContent =
+    new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).toUpperCase();
+  document.getElementById('home-sub').textContent = SUBS[period];
+
+  const hc = document.getElementById('hero-card');
+  hc.className = 'hero-card ' + cls;
+  document.getElementById('hero-tag').textContent = cls === 'morning' ? '☀️ Bom dia' : '🌙 Boa noite';
+  document.getElementById('hero-greeting').textContent =
+    cls === 'morning' ? 'Pronto para começar?' : 'Como foi o seu dia?';
+  document.getElementById('hero-sub').textContent = SUBS[period];
+
+  // ring
+  const done  = dayDone(TODAY);
+  const total = getAllHabits().length || 1;
+  const pct   = done / total;
+  const circ  = 2 * Math.PI * 33;
+  const ring  = document.getElementById('home-ring');
+  ring.style.strokeDasharray  = circ;
+  ring.style.strokeDashoffset = circ - pct * circ;
+  ring.style.stroke = cls === 'morning' ? '#f59e0b' : '#6366f1';
+  document.getElementById('home-pts').textContent = done;
+  document.getElementById('home-of').textContent  = 'de ' + total;
+
+  // stats
+  const streak = calcStreak();
+  document.getElementById('home-streak').textContent = streak + (streak===1?' dia':' dias');
+  document.getElementById('home-week').textContent   = weekTotal() + ' pts';
+  const lvl = getLevel(weekTotal());
+  document.getElementById('home-level').textContent  = lvl.e + ' ' + lvl.t;
+
+  // ritual chips
+  renderRitualChips();
+
+  // areas
+  renderAreasHome();
+
+  // week
+  renderWeekBar('home-week-row');
+}
+
+function renderRitualChips() {
+  ['morning','evening'].forEach(p => {
+    const habits  = getRitualHabits(p);
+    const done    = habits.filter(h => state.habits[TODAY][h.id]).length;
+    const total   = habits.length;
+    const pct     = total ? Math.round((done/total)*100) : 0;
+    document.getElementById('chip-' + p + '-prog').textContent = done + '/' + total + ' feitos';
+    document.getElementById('chip-' + p + '-bar').style.width  = pct + '%';
+  });
+}
+
+function renderAreasHome() {
+  const cont = document.getElementById('areas-home');
+  cont.innerHTML = '';
+  DEFAULT_AREAS.forEach((area,i) => {
+    const habits  = getAreaHabits(area.id);
+    const done    = habits.filter(h => state.habits[TODAY][h.id]).length;
+    const total   = habits.length;
+
+    const card = document.createElement('div');
+    card.className = 'area-card fade-up';
+    card.style.animationDelay = (i * 0.05) + 's';
+    card.id = 'area-card-' + area.id;
+
+    const habitsHtml = habits.map(h => {
+      const isDone = !!state.habits[TODAY][h.id];
+      return `
+        <div class="habit-row" id="hr-${h.id}">
+          <div class="hbox${isDone?' done':''}" onclick="toggleHabit('${h.id}',this)">${isDone?'✓':''}</div>
+          <span class="htxt${isDone?' done':''}">${h.text}</span>
+          <span style="font-size:10px;color:var(--muted2);margin-right:4px;">${h.period==='morning'?'☀️':h.period==='evening'?'🌙':''}</span>
+        </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="area-head" onclick="toggleArea('${area.id}')">
+        <div class="area-ico ${area.cls}">${area.icon}</div>
+        <div class="area-title">
+          <div class="area-name">${area.label}</div>
+          <div class="area-prog" id="area-prog-${area.id}">${done}/${total} hábitos</div>
+        </div>
+        <div class="area-chevron">›</div>
       </div>
-    `;
+      <div class="area-body">
+        <div class="habit-list">${habitsHtml}</div>
+        <div class="area-add">
+          <input class="area-add-inp" id="ainp-${area.id}" placeholder="Adicionar hábito…"
+            onkeydown="if(event.key==='Enter')addHabitToArea('${area.id}')"/>
+          <button class="area-add-btn" onclick="addHabitToArea('${area.id}')">+</button>
+        </div>
+      </div>`;
+    cont.appendChild(card);
+  });
+}
+
+function toggleArea(areaId) {
+  const card = document.getElementById('area-card-' + areaId);
+  card.classList.toggle('open');
+}
+
+function toggleHabit(habitId, el) {
+  const was = !!state.habits[TODAY][habitId];
+  state.habits[TODAY][habitId] = !was;
+  save();
+
+  el.classList.toggle('done', !was);
+  el.textContent = !was ? '✓' : '';
+  if (!was) {
+    el.classList.add('check-pop');
+    setTimeout(() => el.classList.remove('check-pop'), 320);
+  }
+  const row = el.closest('.habit-row');
+  if (row) {
+    const txt = row.querySelector('.htxt');
+    if (txt) txt.classList.toggle('done', !was);
+  }
+  updateAreaProg(habitId);
+  refreshHomeRing();
+}
+
+function updateAreaProg(habitId) {
+  const habit = getAllHabits().find(h => h.id === habitId);
+  if (!habit) return;
+  const habits = getAreaHabits(habit.areaId);
+  const done   = habits.filter(h => state.habits[TODAY][h.id]).length;
+  const prog   = document.getElementById('area-prog-' + habit.areaId);
+  if (prog) prog.textContent = done + '/' + habits.length + ' hábitos';
+}
+
+function refreshHomeRing() {
+  const done  = dayDone(TODAY);
+  const total = getAllHabits().length || 1;
+  const circ  = 2 * Math.PI * 33;
+  const ring  = document.getElementById('home-ring');
+  if (!ring) return;
+  ring.style.strokeDashoffset = circ - (done/total) * circ;
+  document.getElementById('home-pts').textContent = done;
+  renderRitualChips();
+}
+
+function addHabitToArea(areaId) {
+  const inp  = document.getElementById('ainp-' + areaId);
+  const text = inp.value.trim();
+  if (!text) return;
+  const newH = {id: uid(), areaId, text, period:'any'};
+  state.customHabits.push(newH);
+  save();
+  inp.value = '';
+  renderAreasHome();
+  showToast('Hábito adicionado ✓');
+}
+
+function renderWeekBar(containerId) {
+  const dates = weekDates();
+  const total = getAllHabits().length || 1;
+  let html = '';
+  dates.forEach(date => {
+    const done = dayDone(date);
+    const pct  = Math.min(Math.round((done/total)*100), 100);
+    const dow  = new Date(date + 'T12:00:00').getDay();
+    const isToday = date === TODAY;
+    html += `
+      <div class="wday${isToday?' today':''}">
+        <div class="wbar"><div class="wbar-fill" style="height:${pct}%"></div></div>
+        <div class="wday-lbl">${DAYS_PT[dow]}</div>
+      </div>`;
+  });
+  document.getElementById(containerId).innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+//  RITUAL SCREEN
+// ═══════════════════════════════════════
+let currentRitual = period === 'evening' ? 'evening' : 'morning';
+let ritualSteps   = {morning:[], evening:[]};
+
+function buildRitualSteps(p) {
+  ritualSteps[p] = getRitualHabits(p);
+}
+
+function setRitual(p) {
+  currentRitual = p;
+  document.getElementById('rs-morning').className = 'rs-btn' + (p==='morning'?' active morning':'');
+  document.getElementById('rs-evening').className = 'rs-btn' + (p==='evening'?' active evening':'');
+  buildRitualSteps(p);
+  state.ritualStep[p] = 0;
+  renderRitualContent();
+}
+
+function renderRitualScreen() {
+  buildRitualSteps('morning');
+  buildRitualSteps('evening');
+  setRitual(currentRitual);
+}
+
+function renderRitualContent() {
+  const p     = currentRitual;
+  const steps = ritualSteps[p];
+  const step  = state.ritualStep[p] || 0;
+  const cont  = document.getElementById('ritual-content');
+  const flowCls = p + '-flow';
+
+  if (!steps.length) {
+    cont.innerHTML = `
+      <div style="text-align:center;padding:40px 24px;">
+        <div style="font-size:40px;margin-bottom:12px;">📝</div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:8px;">Ritual vazio</div>
+        <div style="font-size:13px;color:var(--muted);">Adicione hábitos em Config → ${p==='morning'?'Ritual Matinal':'Ritual Noturno'}</div>
+      </div>`;
     return;
   }
 
-  const s   = steps[currentStep];
-  const cls = getRoutineClass();
-  const total = steps.length;
+  // progress bar
+  const pct = Math.round((step / steps.length) * 100);
+  const progressHtml = `<div class="step-progress-bar ${flowCls}"><div class="step-progress-fill" style="width:${pct}%"></div></div>`;
 
-  container.innerHTML = `
-    <div class="routine ${cls}">
-      <div class="r-title">${s.areaLabel}</div>
-      <div class="step">
-        <div class="step-counter">${currentStep + 1} de ${total}</div>
-        <div class="step-title">${s.text}</div>
-        <button class="step-btn" onclick="completeStep()">✓ Feito</button>
-        <button class="step-skip" onclick="skipStep()">Pular por hoje</button>
-      </div>
-    </div>
-  `;
-}
-
-function completeStep() {
-  const s = steps[currentStep];
-  // FIX: usa habitId como chave, não o texto
-  if (!state.habits[TODAY][s.areaId]) state.habits[TODAY][s.areaId] = {};
-  state.habits[TODAY][s.areaId][s.habitId] = true;
-  state.days[TODAY][s.areaId] = (state.days[TODAY][s.areaId] || 0) + 1;
-  currentStep++;
-  save();
-  renderStep();
-}
-
-function skipStep() {
-  currentStep++;
-  renderStep();
-}
-
-function restartSteps() {
-  currentStep = 0;
-  renderStep();
-}
-
-// ===== WEEK =====
-
-function dayTotal(date) {
-  const d = state.habits[date] || {};
-  let total = 0;
-  Object.values(d).forEach(area => {
-    if (typeof area === 'object') total += Object.keys(area).length;
-  });
-  return total;
-}
-
-function renderWeek() {
-  const totalHabits = steps.length || 1;
-
-  // FIX: cria novo Date para cada dia em vez de mutar o mesmo objeto
-  const dates = Array.from({length:7}, (_,i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (6 - i));
-    return d;
-  });
-
-  let html = '<div class="week-wrap"><div class="week-label">Últimos 7 dias</div><div class="week">';
-
-  dates.forEach(d => {
-    const key   = d.toISOString().slice(0,10);
-    const total = dayTotal(key);
-    const pct   = Math.min(Math.round((total / totalHabits) * 100), 100);
-    const dow   = d.getDay();
-    const isToday = key === TODAY;
-
-    html += `
-      <div class="wday${isToday ? ' today' : ''}">
-        <div class="wbar">
-          <div class="wbar-fill" style="height:${pct}%"></div>
-        </div>
-        <div class="wday-label">${DAYS_PT[dow]}</div>
-      </div>
-    `;
-  });
-
-  html += '</div></div>';
-  document.getElementById('view-week').innerHTML = html;
-}
-
-// ===== MONTH =====
-
-function renderMonth() {
-  const now  = new Date();
-  const year = now.getFullYear();
-  const mon  = now.getMonth();
-  const last = new Date(year, mon + 1, 0).getDate();
-
-  let html = '<div class="month-wrap"><div class="month-label">' +
-    now.toLocaleDateString('pt-BR', {month:'long', year:'numeric'}) +
-    '</div><div class="month-grid">';
-
-  for (let i = 1; i <= last; i++) {
-    // FIX: usa new Date com ano/mês/dia explícito para evitar problemas de fuso
-    const d   = new Date(year, mon, i);
-    const key = d.toISOString().slice(0,10);
-    const total = dayTotal(key);
-    const lvl   = total >= 4 ? 3 : total >= 2 ? 2 : total >= 1 ? 1 : 0;
-    html += `<div class="month-day l${lvl}" title="${key}"></div>`;
+  if (step >= steps.length) {
+    // todos feitos
+    const doneCount = steps.filter(h => state.habits[TODAY][h.id]).length;
+    cont.innerHTML = progressHtml + `
+      <div class="ritual-done fade-up">
+        <span class="rd-emoji">${p==='morning'?'🌟':'🌙'}</span>
+        <div class="rd-title">${p==='morning'?'Manhã concluída!':'Noite concluída!'}</div>
+        <div class="rd-sub">${doneCount} de ${steps.length} hábitos marcados.<br>Cada dia conta.</div>
+        <div class="rd-streak">🔥 Sequência: ${calcStreak()} dias</div>
+        <button class="rd-btn" onclick="restartRitual()">↩ Rever hábitos</button>
+      </div>`;
+    return;
   }
 
-  html += '</div></div>';
-  document.getElementById('view-month').innerHTML = html;
+  const s     = steps[step];
+  const area  = DEFAULT_AREAS.find(a => a.id === s.areaId);
+  const isDone = !!state.habits[TODAY][s.id];
+
+  cont.innerHTML = progressHtml + `
+    <div class="${flowCls}" style="padding:0 0 20px;">
+      <div class="ritual-hero ${p}">
+        <span class="rh-emoji">${area ? area.icon : '✦'}</span>
+        <div class="rh-label ${p}">${p==='morning'?'Ritual Matinal':'Ritual Noturno'}</div>
+        <div class="rh-title">${s.text}</div>
+        <div class="rh-sub">${area ? area.label : ''}</div>
+      </div>
+      <div style="padding:16px;">
+        <div class="step-inner fade-up">
+          <div class="step-num">${step+1} de ${steps.length}</div>
+          <div class="step-title">${s.text}</div>
+          <div class="step-area">${area ? area.icon + ' ' + area.label : ''}</div>
+          ${isDone
+            ? `<div style="background:var(--green-light);color:var(--green);border-radius:12px;padding:12px;font-weight:600;margin-bottom:8px;">✓ Já marcado</div>`
+            : `<button class="step-done-btn" onclick="stepComplete()">✓ Feito</button>`}
+          <button class="step-skip-btn" onclick="stepSkip()">Pular</button>
+        </div>
+      </div>
+    </div>`;
 }
 
-// ===== INIT =====
-buildSteps();
-renderStep();
+function stepComplete() {
+  const p = currentRitual;
+  const s = ritualSteps[p][state.ritualStep[p]];
+  if (s) {
+    state.habits[TODAY][s.id] = true;
+    save();
+  }
+  state.ritualStep[p] = (state.ritualStep[p] || 0) + 1;
+  save();
+  renderRitualContent();
+}
+
+function stepSkip() {
+  const p = currentRitual;
+  state.ritualStep[p] = (state.ritualStep[p] || 0) + 1;
+  save();
+  renderRitualContent();
+}
+
+function restartRitual() {
+  state.ritualStep[currentRitual] = 0;
+  save();
+  renderRitualContent();
+}
+
+// ═══════════════════════════════════════
+//  MÊS
+// ═══════════════════════════════════════
+function renderMonth() {
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const mon   = now.getMonth();
+  const last  = new Date(year, mon+1, 0).getDate();
+  const total = getAllHabits().length || 1;
+
+  // stats
+  let daysActive = 0, best = 0, totalDone = 0;
+  for (let i = 1; i <= last; i++) {
+    const d   = new Date(year, mon, i);
+    const key = d.toISOString().slice(0,10);
+    const done = dayDone(key);
+    totalDone += done;
+    if (done > 0) daysActive++;
+    if (done > best) best = done;
+  }
+
+  document.getElementById('month-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${daysActive}</div><div class="stat-lbl">dias ativos</div></div>
+    <div class="stat-card"><div class="stat-val">${calcStreak()}</div><div class="stat-lbl">sequência atual</div></div>
+    <div class="stat-card"><div class="stat-val">${totalDone}</div><div class="stat-lbl">hábitos no mês</div></div>
+    <div class="stat-card"><div class="stat-val">${best}</div><div class="stat-lbl">melhor dia</div></div>
+  `;
+
+  // grid
+  let html = '';
+  for (let i = 1; i <= last; i++) {
+    const d    = new Date(year, mon, i);
+    const key  = d.toISOString().slice(0,10);
+    const done = dayDone(key);
+    const pct  = done / total;
+    const lvl  = pct >= .8 ? 3 : pct >= .4 ? 2 : pct >= .1 ? 1 : 0;
+    const isToday = key === TODAY;
+    html += `<div class="mday l${lvl}${isToday?' today':''}" title="${key}: ${done} hábitos"></div>`;
+  }
+  document.getElementById('month-grid').innerHTML = html;
+
+  // missões
+  renderMissions();
+}
+
+function renderMissions() {
+  const week = weekDates();
+  let treinou=0, agua=0, leu=0;
+  const streak = calcStreak();
+
+  week.forEach(d => {
+    const h = state.habits[d] || {};
+    if (h['h1']) treinou++;
+    if (h['h3']) agua++;
+    if (h['h6']) leu++;
+  });
+
+  const missions = [
+    {icon:'💪', name:'Treinar 4x',       prog:treinou, total:4},
+    {icon:'💧', name:'Hidratação 7x',     prog:agua,    total:7},
+    {icon:'📚', name:'Ler 5x na semana',  prog:leu,     total:5},
+    {icon:'🔥', name:'7 dias seguidos',   prog:Math.min(streak,7), total:7},
+  ];
+
+  document.getElementById('missions-wrap').innerHTML = missions.map(m => {
+    const done = m.prog >= m.total;
+    const pct  = Math.round(Math.min(m.prog/m.total,1)*100);
+    return `
+      <div style="background:var(--white);border:1px solid var(--cream3);border-radius:var(--r);
+        padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;
+        ${done?'border-color:#bbf7d0;background:#f0fdf4;':''}">
+        <span style="font-size:22px;">${done?'🏆':m.icon}</span>
+        <div style="flex:1;">
+          <div style="font-size:13.5px;font-weight:600;">${m.name}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${m.prog} de ${m.total}${done?' — Concluída! 🎉':''}</div>
+          <div style="height:3px;background:var(--cream3);border-radius:2px;margin-top:6px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${done?'var(--green)':'var(--brown)'};border-radius:2px;transition:width .5s;"></div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════
+let cfgArea = DEFAULT_AREAS[0].id;
+
+function renderConfig() {
+  // notif times
+  document.getElementById('notif-morning').value = state.notifTimes.morning || '06:00';
+  document.getElementById('notif-evening').value = state.notifTimes.evening || '21:00';
+  ['morning','evening','summary'].forEach(k => {
+    const tog = document.getElementById('tog-' + k);
+    if (tog) tog.className = 'toggle' + (state.notifOn[k] !== false ? ' on' : '');
+  });
+
+  // ritual counts
+  document.getElementById('cfg-morning-count').textContent =
+    getRitualHabits('morning').length + ' hábitos';
+  document.getElementById('cfg-evening-count').textContent =
+    getRitualHabits('evening').length + ' hábitos';
+
+  // area chips
+  const chipsEl = document.getElementById('cfg-area-chips');
+  chipsEl.innerHTML = DEFAULT_AREAS.map(a =>
+    `<div class="area-chip${a.id===cfgArea?' sel':''}" onclick="setCfgArea('${a.id}')">${a.icon} ${a.label}</div>`
+  ).join('');
+
+  renderCfgHabits();
+}
+
+function setCfgArea(id) {
+  cfgArea = id;
+  renderConfig();
+}
+
+function renderCfgHabits() {
+  const habits = getAreaHabits(cfgArea);
+  const el = document.getElementById('cfg-habit-list');
+  if (!habits.length) {
+    el.innerHTML = `<div style="padding:14px 16px;background:var(--white);border:1px solid var(--cream3);border-radius:var(--r);font-size:13px;color:var(--muted);">Nenhum hábito nesta área ainda.</div>`;
+    return;
+  }
+  el.innerHTML = habits.map((h, i) => {
+    const isDefault = DEFAULT_HABITS.some(d => d.id === h.id);
+    const first = i === 0, last = i === habits.length-1;
+    const radius = first && last ? 'var(--r)' : first ? 'var(--r) var(--r) 0 0' : last ? '0 0 var(--r) var(--r)' : '0';
+    return `
+      <div class="habit-edit-row" style="border-radius:${radius};${i>0?'border-top:none;':''}">
+        <span class="he-drag">⠿</span>
+        <span class="he-txt">${h.text}</span>
+        <span class="he-badge ${h.period==='morning'?'morning':h.period==='evening'?'evening':''}" style="${h.period==='any'?'background:var(--cream2);color:var(--muted);':''}">
+          ${h.period==='morning'?'☀️ Manhã':h.period==='evening'?'🌙 Noite':'🔄 Livre'}
+        </span>
+        ${!isDefault
+          ? `<button class="he-del" onclick="cfgDelHabit('${h.id}')">✕</button>`
+          : `<span style="width:24px;"></span>`}
+      </div>`;
+  }).join('');
+}
+
+function cfgAddHabit() {
+  const inp    = document.getElementById('cfg-hab-inp');
+  const period = document.getElementById('cfg-hab-period').value;
+  const text   = inp.value.trim();
+  if (!text) return;
+  const newH = {id: uid(), areaId: cfgArea, text, period};
+  state.customHabits.push(newH);
+  save();
+  inp.value = '';
+  renderConfig();
+  showToast('Hábito adicionado ✓');
+}
+
+function cfgDelHabit(id) {
+  state.customHabits = state.customHabits.filter(h => h.id !== id);
+  // remove from rituals too
+  ['morning','evening'].forEach(p => {
+    state.rituals[p] = state.rituals[p].filter(rid => rid !== id);
+  });
+  save();
+  renderConfig();
+}
+
+// ─── ritual config ───
+function renderRitualConfig(p) {
+  const all     = getAllHabits();
+  const current = state.rituals[p] || [];
+  const listEl  = document.getElementById(p + '-ritual-list');
+
+  if (!current.length) {
+    listEl.innerHTML = `<div style="padding:14px 16px;background:var(--white);border:1px solid var(--cream3);border-radius:var(--r);font-size:13px;color:var(--muted);">Nenhum hábito no ritual ainda.</div>`;
+    return;
+  }
+  listEl.innerHTML = current.map((id, i) => {
+    const h     = all.find(h => h.id === id);
+    if (!h) return '';
+    const area  = DEFAULT_AREAS.find(a => a.id === h.areaId);
+    const first = i === 0, last = i === current.length-1;
+    const radius = first && last ? 'var(--r)' : first ? 'var(--r) var(--r) 0 0' : last ? '0 0 var(--r) var(--r)' : '0';
+    return `
+      <div class="habit-edit-row" style="border-radius:${radius};${i>0?'border-top:none;':''}">
+        <span class="he-drag">⠿</span>
+        <span class="he-txt">${h.text}</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:4px;">${area?area.icon:''}</span>
+        <button class="he-del" onclick="removeFromRitual('${p}','${id}')">✕</button>
+      </div>`;
+  }).join('');
+}
+
+function addRitualHabit(p) {
+  const inp  = document.getElementById(p + '-ritual-inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  const newH = {id: uid(), areaId: p === 'morning' ? 'corpo' : 'mente', text, period: p};
+  state.customHabits.push(newH);
+  if (!state.rituals[p]) state.rituals[p] = [];
+  state.rituals[p].push(newH.id);
+  save();
+  inp.value = '';
+  renderRitualConfig(p);
+  showToast('Adicionado ao ritual ✓');
+}
+
+function removeFromRitual(p, id) {
+  state.rituals[p] = (state.rituals[p]||[]).filter(rid => rid !== id);
+  save();
+  renderRitualConfig(p);
+}
+
+// ─── notificações ───
+function saveNotifTime(p, v) {
+  state.notifTimes[p] = v;
+  save();
+  scheduleNotifications();
+}
+
+function toggleNotif(k, btn) {
+  state.notifOn[k] = !state.notifOn[k];
+  btn.classList.toggle('on', state.notifOn[k]);
+  save();
+  scheduleNotifications();
+}
+
+function resetToday() {
+  if (!confirm('Limpar todos os hábitos de hoje?')) return;
+  state.habits[TODAY] = {};
+  state.ritualStep = {morning:0, evening:0};
+  save();
+  renderHome();
+  showToast('Dia resetado');
+}
+
+// ═══════════════════════════════════════
+//  NOTIFICAÇÕES
+// ═══════════════════════════════════════
+let notifTimers = [];
+
+function scheduleNotifications() {
+  notifTimers.forEach(t => clearTimeout(t));
+  notifTimers = [];
+
+  if (typeof Notification === 'undefined') return;
+
+  const schedule = (timeStr, title, body, tag) => {
+    const [h, m] = timeStr.split(':').map(Number);
+    const now    = new Date();
+    const target = new Date();
+    target.setHours(h, m, 0, 0);
+    if (target <= now) target.setDate(target.getDate() + 1);
+    const delay = target - now;
+
+    const fire = () => {
+      if (Notification.permission === 'granted') {
+        new Notification(title, {body, tag, icon:''});
+      }
+      notifTimers.push(setTimeout(fire, 24*60*60*1000));
+    };
+    notifTimers.push(setTimeout(fire, delay));
+  };
+
+  if (state.notifOn.morning !== false) {
+    schedule(state.notifTimes.morning||'06:00',
+      'Bom dia! ☀️ Hora do ritual matinal',
+      'Seus hábitos de manhã estão esperando por você.', 'morning');
+  }
+  if (state.notifOn.evening !== false) {
+    schedule(state.notifTimes.evening||'21:00',
+      'Hora do ritual noturno 🌙',
+      'Encerre o dia com intenção. Mantenha a sequência.', 'evening');
+  }
+  if (state.notifOn.summary !== false) {
+    schedule('22:00',
+      'Como foi o seu dia? 📊',
+      `Você completou ${dayDone(TODAY)} hábitos hoje.`, 'summary');
+  }
+}
+
+function requestNotifPermission() {
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') {
+        scheduleNotifications();
+        showToast('Notificações ativadas ✓');
+      }
+    });
+  } else if (Notification.permission === 'granted') {
+    scheduleNotifications();
+  }
+}
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+let toastTimer = null;
+function showToast(msg) {
+  const old = document.querySelector('.toast');
+  if (old) old.remove();
+  clearTimeout(toastTimer);
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  toastTimer = setTimeout(() => {
+    el.style.transition = 'opacity .3s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 320);
+  }, 2200);
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+renderHome();
+
+// pede permissão de notificação após primeiro clique
+document.addEventListener('click', function askNotif() {
+  requestNotifPermission();
+  document.removeEventListener('click', askNotif);
+}, {once: true});
 </script>
 </body>
 </html>
