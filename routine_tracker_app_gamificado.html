@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Routine Tracker Premium</title>
+<style>
+  body {
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    background: linear-gradient(180deg,#f2f2f7,#e5e5ea);
+    color:#1c1c1e;
+  }
+
+  .container {
+    max-width:420px;
+    margin:auto;
+    padding:20px;
+  }
+
+  h1 {
+    font-size:26px;
+    font-weight:700;
+    margin-bottom:5px;
+  }
+
+  .subtitle {
+    font-size:14px;
+    opacity:0.6;
+    margin-bottom:20px;
+  }
+
+  .card {
+    background:rgba(255,255,255,0.7);
+    backdrop-filter: blur(10px);
+    border-radius:24px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  }
+
+  .title {
+    font-weight:600;
+    margin-bottom:10px;
+  }
+
+  .buttons {
+    display:flex;
+    gap:10px;
+  }
+
+  button {
+    flex:1;
+    padding:12px;
+    border-radius:14px;
+    border:none;
+    font-size:14px;
+    cursor:pointer;
+    opacity:0.6;
+    transition:all 0.2s ease;
+  }
+
+  button.active {
+    transform:scale(1.08);
+    opacity:1;
+    box-shadow:0 6px 14px rgba(0,0,0,0.15);
+  }
+
+  .zero { background:#d1d1d6; }
+  .one { background:#ffd60a; }
+  .two { background:#30d158; color:white; }
+
+  .score {
+    text-align:center;
+    margin-top:16px;
+    font-size:20px;
+    font-weight:700;
+  }
+
+  .progress {
+    height:10px;
+    background:#d1d1d6;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:10px;
+  }
+
+  .progress-bar {
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#0a84ff,#5e5ce6);
+  }
+
+  .weekly {
+    margin-top:20px;
+    text-align:center;
+  }
+
+  .badge {
+    font-weight:600;
+    margin-top:6px;
+  }
+
+  .streak {
+    margin-top:10px;
+    font-size:14px;
+  }
+
+  .missions {
+    margin-top:20px;
+  }
+
+  .mission {
+    font-size:14px;
+    margin-bottom:6px;
+  }
+
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Seu Dia</h1>
+  <div class="subtitle">consistência > perfeição</div>
+
+  <div id="areas"></div>
+
+  <div class="score" id="score">0 / 8</div>
+  <div class="progress"><div class="progress-bar" id="progress"></div></div>
+
+  <div class="weekly">
+    <div id="weeklyScore"></div>
+    <div class="badge" id="badge"></div>
+    <div class="streak" id="streak"></div>
+  </div>
+
+  <div class="card missions">
+    <div class="title">Missões</div>
+    <div id="missions"></div>
+  </div>
+</div>
+
+<script>
+const config = {
+  areas: [
+    { id:'corpo', label:'🏋️ Corpo' },
+    { id:'casa', label:'🏠 Casa' },
+    { id:'relacionamento', label:'❤️ Relacionamento' },
+    { id:'voce', label:'🧠 Você' }
+  ]
+};
+
+const todayKey = new Date().toISOString().slice(0,10);
+let data = JSON.parse(localStorage.getItem('routineData') || '{}');
+
+if (!data[todayKey]) {
+  data[todayKey] = { corpo:0,casa:0,relacionamento:0,voce:0 };
+}
+
+function renderAreas(){
+  const container = document.getElementById('areas');
+  container.innerHTML='';
+
+  config.areas.forEach(area=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <div class="title">${area.label}</div>
+      <div class="buttons">
+        <button class="zero" onclick="setScore(event,'${area.id}',0)">0</button>
+        <button class="one" onclick="setScore(event,'${area.id}',1)">+1</button>
+        <button class="two" onclick="setScore(event,'${area.id}',2)">+2</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function setScore(e,area,value){
+  data[todayKey][area]=value;
+  localStorage.setItem('routineData',JSON.stringify(data));
+
+  const buttons=e.target.parentElement.querySelectorAll('button');
+  buttons.forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+
+  update();
+}
+
+function update(){
+  const total = Object.values(data[todayKey]).reduce((a,b)=>a+b,0);
+  document.getElementById('score').innerText= total + ' / 8';
+  document.getElementById('progress').style.width=(total/8*100)+'%';
+
+  updateWeekly();
+  updateStreak();
+  updateMissions();
+}
+
+function getWeekDates(){
+  const now=new Date();
+  const day=now.getDay();
+  const diff=now.getDate()-day+(day===0?-6:1);
+  const monday=new Date(now.setDate(diff));
+
+  let dates=[];
+  for(let i=0;i<7;i++){
+    let d=new Date(monday);
+    d.setDate(monday.getDate()+i);
+    dates.push(d.toISOString().slice(0,10));
+  }
+  return dates;
+}
+
+function updateWeekly(){
+  const week=getWeekDates();
+  let total=0;
+
+  week.forEach(d=>{
+    if(data[d]) total+=Object.values(data[d]).reduce((a,b)=>a+b,0);
+  });
+
+  document.getElementById('weeklyScore').innerText='Semana: '+total;
+
+  let badge='';
+  if(total<=15) badge='💤 sobrevivência';
+  else if(total<=25) badge='⚖️ equilíbrio';
+  else if(total<=35) badge='🔥 consistência';
+  else badge='🚀 elite';
+
+  document.getElementById('badge').innerText=badge;
+}
+
+function updateStreak(){
+  let streak=0;
+  const keys=Object.keys(data).sort().reverse();
+
+  for(let k of keys){
+    const total=Object.values(data[k]).reduce((a,b)=>a+b,0);
+    if(total>=4) streak++;
+    else break;
+  }
+
+  document.getElementById('streak').innerText='🔥 '+streak+' dias consistentes';
+}
+
+function updateMissions(){
+  const week=getWeekDates();
+  let treino=0;
+  let movimento=0;
+
+  week.forEach(d=>{
+    if(data[d]){
+      if(data[d].corpo===2) treino++;
+      if(data[d].corpo>0) movimento++;
+    }
+  });
+
+  const missions = [
+    { text:`Treinos completos: ${treino}/4`, done:treino>=4 },
+    { text:`Movimento diário: ${movimento}/7`, done:movimento>=7 }
+  ];
+
+  const container=document.getElementById('missions');
+  container.innerHTML='';
+
+  missions.forEach(m=>{
+    const div=document.createElement('div');
+    div.className='mission';
+    div.innerText=(m.done?'✅ ':'⬜ ')+m.text;
+    container.appendChild(div);
+  });
+}
+
+function load(){
+  renderAreas();
+  update();
+}
+
+// NOTIFICAÇÃO SIMPLES
+if(Notification && Notification.permission!=='granted'){
+  Notification.requestPermission();
+}
+
+function notify(){
+  if(Notification.permission==='granted'){
+    new Notification('Hora de cuidar de você ✨',{
+      body:'Marca seus pontos do dia e mantém sua consistência'
+    });
+  }
+}
+
+setInterval(notify, 1000*60*60*6); // a cada 6h
+
+load();
+</script>
+</body>
+</html>
